@@ -193,6 +193,38 @@ const CASES = [
 /* ---------- 실행(DOMContentLoaded 보장) ---------- */
 document.addEventListener('DOMContentLoaded', () => {
 
+     /* ① 헤더만 고정하도록 sticky 변수 0으로 정리 (기존 보정 로직 무력화) */
+  const root = document.documentElement;
+  root.style.setProperty('--sticky-toolbar', '0px');
+  root.style.setProperty('--sticky-filters', '0px');
+
+  /* ② 우측 하단 [위로가기] 버튼 생성 */
+  const toTop = document.createElement('button');
+  toTop.id = 'backToTop';
+  toTop.type = 'button';
+  toTop.textContent = '위로';
+  document.body.appendChild(toTop);
+
+  // 부드러운 스크롤
+  toTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // 스크롤 위치에 따라 표시/숨김
+  const toggleToTop = () => {
+    if (window.scrollY > 400) toTop.classList.add('show');
+    else toTop.classList.remove('show');
+  };
+  window.addEventListener('scroll', toggleToTop, { passive: true });
+  toggleToTop();
+
+  /* ③ (선택) 기존 sticky 오프셋 자동 보정 함수가 있다면 0으로 유지 */
+  if (typeof updateStickyOffset === 'function') {
+    // 툴바/필터 sticky를 쓰지 않으므로 고정값 유지
+    root.style.setProperty('--sticky-toolbar', '0px');
+    root.style.setProperty('--sticky-filters', '0px');
+  }
+
   // 리스트 UI 모드 활성화
   document.body.classList.add('list-mode');
 
