@@ -351,6 +351,22 @@ ${row.a}
     window.open(ghIssuesListURL(), '_blank','noopener');
   });
 
+   /* ===== Sticky Position Auto-Adjustment ===== */
+function updateStickyOffset(){
+  const tb = document.querySelector('.toolbar');
+  const fl = document.querySelector('.filters');
+  const root = document.documentElement;
+  const tbH = tb ? tb.offsetHeight : 0;
+  const flH = fl ? fl.offsetHeight : 0;
+  root.style.setProperty('--sticky-toolbar', tbH + 'px');
+  root.style.setProperty('--sticky-filters', flH + 'px');
+  root.style.setProperty('--sticky-offset', (tbH + flH) + 'px');
+}
+window.addEventListener('resize', updateStickyOffset);
+new ResizeObserver(updateStickyOffset).observe(document.body);
+document.addEventListener('DOMContentLoaded', updateStickyOffset);
+
+
   /* 시작 */
   renderChips();
   render();
