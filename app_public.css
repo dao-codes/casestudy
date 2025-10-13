@@ -1,338 +1,182 @@
 /* =========================================================================
-  app_public.css — Public UX Stable Version (Sticky Safe Layout)
-  기본 라이트 / 다크 토글 지원
-  검색·필터 고정 + 테이블 헤더 충돌 방지 + 공공형 스타일링
+  app_public.css — Stable Public UX (List/Card Layout)
+  - 기본 라이트 / 버튼으로 다크 전환 지원
+  - 검색/필터 sticky (헤더는 리스트형이라 숨김)
+  - 테이블 → 카드 리스트 전환 (데스크톱/모바일 반응형)
   ======================================================================= */
 
 /* ---------- Design Tokens ---------- */
 :root{
-  --bg:#ffffff;
-  --surface:#f7f9fc;
-  --text:#1f2430;
-  --muted:#5e6b8a;
-  --line:#e3e6ef;
-  --primary:#1158d3;
-  --primary-ink:#ffffff;
-  --primary-weak:#e7f0ff;
-  --radius-lg:16px;
-  --radius-md:12px;
-  --radius-sm:8px;
+  --bg:#ffffff; --surface:#f7f9fc; --text:#1f2430; --muted:#5e6b8a; --line:#e3e6ef;
+  --primary:#1158d3; --primary-ink:#ffffff; --primary-weak:#e7f0ff;
+
+  --radius-lg:16px; --radius-md:12px; --radius-sm:8px;
   --shadow-1:0 1px 2px rgba(0,0,0,.06), 0 1px 6px rgba(0,0,0,.03);
-  --font-sans: "Noto Sans KR", Pretendard, system-ui, sans-serif;
+  --font-sans:"Noto Sans KR", Pretendard, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Helvetica Neue", sans-serif;
+
+  /* Sticky heights (JS가 실측값으로 덮어씀) */
   --sticky-toolbar:56px;
   --sticky-filters:72px;
-  --sticky-offset:calc(var(--sticky-toolbar) + var(--sticky-filters));
 }
 
-/* 다크모드 */
 html[data-theme="dark"]{
-  --bg:#121417;
-  --surface:#1b1f25;
-  --text:#e4e7ec;
-  --muted:#8891a1;
-  --line:#2b303a;
-  --primary:#6ea8ff;
-  --primary-ink:#0c1b33;
-  --primary-weak:#10315c;
+  --bg:#121417; --surface:#1b1f25; --text:#e4e7ec; --muted:#8891a1; --line:#2b303a;
+  --primary:#6ea8ff; --primary-ink:#0c1b33; --primary-weak:#10315c;
 }
 
-/* ---------- Layout Basics ---------- */
-body{
-  margin:0;
-  font-family:var(--font-sans);
-  background:var(--bg);
-  color:var(--text);
-  line-height:1.45;
-}
+/* ---------- Base ---------- */
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--text); font-family:var(--font-sans); line-height:1.45; }
+a{ color:var(--primary); text-decoration:none; }
+a:hover{ text-decoration:underline; }
 .wrap{ max-width:1080px; margin:0 auto; padding:6px 18px 40px; }
 
 /* ---------- Header ---------- */
-header{
-  text-align:center;
-  border-bottom:1px solid var(--line);
-  padding:14px 18px 12px;
-  margin-bottom:6px;
-}
+header{ text-align:center; border-bottom:1px solid var(--line); padding:14px 18px 12px; margin-bottom:6px; }
 .title{ font-size:26px; font-weight:800; margin:0; }
 .sub{ color:var(--muted); font-size:14px; }
-@media(max-width:640px){
-  header{ text-align:left; }
-}
+@media (max-width:640px){ header{ text-align:left; } }
 
-/* ---------- Toolbar ---------- */
+/* ---------- Toolbar (sticky) ---------- */
 .toolbar{
-  position:sticky;
-  top:0;
-  z-index:30;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  padding:10px 0;
-  background:var(--bg);
-  border-bottom:1px solid var(--line);
+  position:sticky; top:0; z-index:30;
+  display:flex; flex-wrap:wrap; gap:8px; padding:10px 0; margin:8px 0 8px;
+  background:var(--bg); border-bottom:1px solid var(--line);
 }
 .toolbar input[type="search"]{
-  flex:1;
-  height:38px;
-  padding:0 10px;
-  border-radius:8px;
-  border:1px solid var(--line);
-  background:var(--surface);
-  color:var(--text);
+  flex:1; min-width:240px; height:38px; padding:0 10px;
+  border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text);
 }
 
 /* Buttons */
 .btn{
-  padding:0 14px;
-  height:38px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:8px;
-  border:1px solid var(--line);
-  background:var(--surface);
-  cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  height:38px; padding:0 14px; border-radius:8px;
+  border:1px solid var(--line); background:var(--surface); cursor:pointer; font-weight:700;
 }
-.btn.primary{
-  background:var(--primary);
-  color:var(--primary-ink);
-  border-color:var(--primary);
-}
+.btn.primary{ background:var(--primary); color:var(--primary-ink); border-color:var(--primary); }
+.btn.ghost{ background:transparent; }
 
-/* ---------- Filters ---------- */
+/* ---------- Filters (sticky) ---------- */
 .filters{
-  position:sticky;
-  top:var(--sticky-toolbar);
-  z-index:20;
-  background:var(--bg);
-  padding:10px 0;
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  border-bottom:1px solid var(--line);
+  position:sticky; top:var(--sticky-toolbar); z-index:20;
+  display:flex; flex-wrap:wrap; gap:8px; padding:10px 0; margin:0 0 10px;
+  background:var(--bg); border-bottom:1px solid var(--line);
 }
 .chip{
-  padding:6px 12px;
-  background:var(--surface);
-  border-radius:100px;
-  border:1px solid var(--line);
-  font-size:14px;
-  cursor:pointer;
+  padding:6px 12px; border-radius:999px; border:1px solid var(--line);
+  background:var(--surface); cursor:pointer; white-space:nowrap;
 }
-.chip.active{
-  background:var(--primary-weak);
-  border-color:var(--primary);
-  color:var(--primary);
-}
-
-/* ---------- Table ---------- */
-table{
-  width:100%;
-  border:1px solid var(--line);
-  border-radius:12px;
-  border-spacing:0;
-  overflow:hidden;
-}
-thead th{
-  position:sticky;
-  top:var(--sticky-offset);
-  background:var(--primary);
-  color:white;
-  padding:10px;
-  font-size:15px;
-  z-index:10;
-}
-tbody td{
-  border-top:1px solid var(--line);
-  padding:12px;
-  font-size:15px;
-}
-tbody tr:hover td{ background:rgba(17,88,211,0.06); }
-
-td .row-actions{ display:flex; flex-direction:column; gap:6px; }
-
-/* ---------- Footer ---------- */
-.footer{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding-top:14px;
-}
-.footer > div:last-child{ display:flex; gap:8px; }
-
-/* ---------- Mobile ---------- */
-@media(max-width:640px){
-  :root{ --sticky-filters:118px; }
-  .row-actions{
-
-/* ✅ 모바일 테이블 깨짐 복구 */
-@media (max-width: 640px) {
-
-  /* 테이블을 가로 스크롤 가능하게 */
-  table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* 부드러운 스크롤 */
-    border-spacing: 0;
-    white-space: nowrap; /* 텍스트 vertical 깨짐 방지 */
-  }
-
-  thead, tbody, tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  /* 각 열 비율 재설정 */
-  td[data-h="#"] { width: 40px; }
-  tbody td:nth-child(2) { width: 55%; } /* 민원 사례 넓게 */
-  tbody td:nth-child(3) { width: 30%; } /* 가이드 */
-  tbody td:nth-child(4) { width: 160px; text-align: center; } /* 버튼 영역 */
-
-  /* 텍스트 깨짐 방지 */
-  .q, .resp {
-    white-space: normal !important;
-    word-break: keep-all;
-  }
-
-  /* 버튼 2줄 세로 UI 유지 */
-  td .row-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  /* sticky header 보정 */
-  thead th {
-    top: var(--sticky-offset);
-  }
-}
+.chip.active{ background:var(--primary-weak); border-color:var(--primary); color:var(--primary); }
 
 /* =========================================================================
    LIST MODE (Table → Card List)
-   - thead 숨김, sticky 해제
-   - 각 tr을 카드처럼 표시 (그리드)
-   - 데스크톱/모바일 반응형
    ======================================================================= */
 
-/* 0) 테이블의 기본 박스는 투명/여백만 유지 */
+/* 테이블 바깥 박스는 투명 처리 (리스트 컨테이너 역할만) */
 table{
-  border: none !important;
-  background: transparent !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  width: 100%;
+  width:100%;
+  border:none !important;
+  background:transparent !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  border-spacing:0;
 }
 
-/* 1) 헤더는 리스트형에서는 숨김 + sticky 완전 해제 */
-thead{ display: none !important; }
-thead th{
-  position: static !important;
-  top: auto !important;
-  background: transparent !important;
-  color: inherit !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-}
+/* 헤더는 숨김(리스트형에서는 불필요) */
+thead{ display:none !important; }
 
-/* 2) tbody를 세로 리스트 컨테이너로 */
+/* 리스트 컨테이너 */
 tbody{
-  display: flex;
-  flex-direction: column;
-  gap: 12px;                     /* 카드 간격 */
+  display:flex;
+  flex-direction:column;
+  gap:12px;                         /* 카드 간격 */
 }
 
-/* 3) 각 행을 '카드'로 표시 (그리드 4열) */
+/* 각 행(tr)을 카드로 렌더링 */
 tbody tr{
-  display: grid;
-  grid-template-columns: 56px 1fr 1fr 200px;   /* 번호 / 사례 / 가이드 / 버튼 */
-  align-items: start;
-  gap: 0;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--bg);
-  box-shadow: var(--shadow-1);
-  overflow: hidden;
+  display:grid;
+  grid-template-columns:56px 1fr 1fr 200px;   /* 번호 / 사례 / 가이드 / 버튼 */
+  align-items:start;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--bg);
+  box-shadow:var(--shadow-1);
+  overflow:hidden;
 }
 
-/* 4) 셀 스타일(테두리 제거, 여백만) */
+/* 셀 스타일 */
 tbody td{
-  border: none !important;
-  padding: 14px 16px !important;
-  background: transparent !important;
-  font-size: 15px;
+  border:none !important;
+  padding:14px 16px !important;
+  background:transparent !important;
+  font-size:15px;
 }
 
-/* 5) 첫 번째 열(#)을 뱃지 느낌으로 */
+/* 번호 칸 */
 td[data-h="#"]{
-  width: 56px !important;
-  text-align: center;
-  color: var(--muted);
-  font-weight: 800;
-  background: color-mix(in oklab, var(--primary-weak) 30%, transparent);
+  width:56px !important;
+  text-align:center;
+  color:var(--muted);
+  font-weight:800;
+  background:color-mix(in oklab, var(--primary-weak) 30%, transparent);
 }
 
-/* 6) 내용 타이포 정리 */
-.q{ font-weight: 800; letter-spacing: -0.2px; }
+/* 텍스트 */
+.q{ font-weight:800; letter-spacing:-.2px; }
 .cat{
-  margin-left: 8px;
-  font-size: 12px;
-  color: var(--muted);
-  border: 1px solid var(--line);
-  padding: 2px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
+  margin-left:8px; font-size:12px; color:var(--muted);
+  border:1px solid var(--line); padding:2px 8px; border-radius:999px; white-space:nowrap;
 }
-.resp{ white-space: pre-wrap; word-break: keep-all; }
+.resp{ white-space:pre-wrap; word-break:keep-all; }
 
-/* 7) 카드 안의 버튼 묶음 */
+/* 카드 안 버튼 묶음 */
 td .row-actions{
-  display: grid !important;
-  grid-template-columns: 1fr;
-  gap: 8px;
+  display:grid !important;
+  grid-template-columns:1fr;
+  gap:8px;
 }
-td .row-actions .btn{ width: 100%; }
+td .row-actions .btn{ width:100%; }
 
-/* 8) 호버 효과(카드 배경) */
+/* 호버 효과 */
 tbody tr:hover{
-  box-shadow: 0 2px 12px rgba(0,0,0,.06);
-  border-color: color-mix(in oklab, var(--primary) 30%, var(--line));
+  box-shadow:0 2px 12px rgba(0,0,0,.06);
+  border-color:color-mix(in oklab, var(--primary) 30%, var(--line));
 }
 
-/* 9) 모바일(≤ 960px): 가이드 영역이 길어지므로 2열로 재배치 */
-@media (max-width: 960px){
+/* ---------- Footer / Pagination ---------- */
+.footer{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:14px; }
+.footer > div:last-child{ display:flex; gap:8px; }
+#pageSize{ height:36px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--text); padding:0 8px; }
+
+/* ---------- Responsive ---------- */
+/* 960px 이하: 2열 레이아웃 (번호+본문) */
+@media (max-width:960px){
   tbody tr{
-    grid-template-columns: 44px 1fr;   /* 번호 + 본문 */
+    grid-template-columns:44px 1fr;
     grid-template-areas:
-      "no   q"
-      "no   a"
-      "no   act";
+      "no q"
+      "no a"
+      "no act";
   }
-  td[data-h="#"]{ grid-area: no; width: 44px !important; }
-  tbody td:nth-child(2){ grid-area: q; }     /* 민원 사례 */
-  tbody td:nth-child(3){ grid-area: a; }     /* 가이드 */
-  tbody td:nth-child(4){ grid-area: act; }   /* 버튼 */
-  td .row-actions{ grid-template-columns: 1fr 1fr; }
+  td[data-h="#"]{ grid-area:no; width:44px !important; }
+  tbody td:nth-child(2){ grid-area:q; }     /* 민원 사례 */
+  tbody td:nth-child(3){ grid-area:a; }     /* 가이드 */
+  tbody td:nth-child(4){ grid-area:act; }   /* 버튼 */
+  td .row-actions{ grid-template-columns:1fr 1fr; }
 }
 
-/* 10) 모바일(≤ 640px): 세로 스택 + 버튼 1열 */
-@media (max-width: 640px){
+/* 640px 이하: 세로 스택 + 버튼 1열, sticky 높이 여유 */
+@media (max-width:640px){
+  :root{ --sticky-filters:118px; }          /* 칩 3줄까지 안전치 */
   tbody tr{
-    grid-template-columns: 40px 1fr;
+    grid-template-columns:40px 1fr;
     grid-template-areas:
-      "no   q"
-      "no   a"
-      "no   act";
+      "no q"
+      "no a"
+      "no act";
   }
-  td[data-h="#"]{ width: 40px !important; padding: 12px 8px !important; }
-  td .row-actions{ grid-template-columns: 1fr; }  /* 버튼 한 줄씩 */
-  .q, .resp{ font-size: 14px; }
+  td[data-h="#"]{ width:40px !important; padding:12px 8px !important; }
+  td .row-actions{ grid-template-columns:1fr; }
+  .q, .resp{ font-size:14px; }
 }
-
-/* 11) 기존 sticky thead 보정은 비활성화 되었으므로,
-       상단 고정은 '검색/필터'만 유지 (아래 두 줄은 유지 권장) */
-.toolbar{ position: sticky; top: 0; z-index: 30; background: var(--bg); border-bottom: 1px solid var(--line); }
-.filters{ position: sticky; top: var(--sticky-toolbar); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
-
-    
