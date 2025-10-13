@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toTop = document.createElement('button');
   toTop.id = 'backToTop';
   toTop.type = 'button';
-  toTop.textContent = '▲';
+  toTop.textContent = '위로';
   document.body.appendChild(toTop);
 
   // 부드러운 스크롤
