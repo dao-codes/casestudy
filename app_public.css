@@ -1,80 +1,166 @@
-/* ===== [공공/보편 UX 패치] 제목 정렬 + 모바일 겹침 방지 ===== */
+/* =========================================================================
+  app_public.css — Public UX Stable Version (Sticky Safe Layout)
+  기본 라이트 / 다크 토글 지원
+  검색·필터 고정 + 테이블 헤더 충돌 방지 + 공공형 스타일링
+  ======================================================================= */
 
-/* 1) 제목: 데스크톱 중앙 정렬(공공 포털 스타일), 최대폭 한정 + 하단 구분선 */
-header{
-  text-align: center;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 12px;
-}
-.wrap{ max-width: 1080px; }   /* 너무 넓어 보이는 느낌 완화 */
-.title{ margin-bottom: 4px; }
-.sub{ display: inline-block; }
-
-/* 2) 모바일(≤640px)에서는 제목/보조문을 좌측 정렬로 전환해 가독성 확보 */
-@media (max-width: 640px){
-  header{ text-align: left; }
-}
-
-/* 3) 버튼/칩이 단어 단위로만 줄바꿈되어 키가 커지며 겹치는 문제 방지 */
-.btn, .chip{ white-space: nowrap; }
-
-/* 4) 모바일에서 sticky 영역 높이 여유 확보(칩 3줄까지 안전) + 행간/글자 보정 */
-@media (max-width: 640px){
-  :root{
-    --toolbar-h: 52px;   /* 검색툴바 높이 약간 상향 */
-    --filters-h: 120px;  /* 칩 3줄 기준(2줄이면 96px로 줄여도 됨) */
-  }
-  /* 검색창/칩 줄 간격 조금 축소 */
-  .toolbar{ padding: 6px 0; }
-  .filters{ padding: 6px 0; }
-
-  /* 표 헤더가 sticky 영역과 겹치지 않도록 보정 */
-  thead th{
-    top: calc(var(--toolbar-h) + var(--filters-h));
-  }
-
-  /* 본문 텍스트 겹침 방지: 문장 길이 자동 줄바꿈 */
-  .q, .resp{ word-break: keep-all; overflow-wrap: anywhere; }
-}
-
-/* 5) 테이블 헤더/본문 시각적 레이어 안정화(겹침/번짐 방지) */
-thead th{
-  position: sticky;
-  z-index: 10;
-  background: var(--primary) !important;
-}
-
-/* 6) 페이지네이션: 한 줄 가로 정렬 유지(재확인) */
-.footer > div:last-child{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* ==== Sticky 영역을 '실제 높이'로 자동 보정하는 변수 ==== */
+/* ---------- Design Tokens ---------- */
 :root{
-  /* JS가 실측값으로 덮어씀. 값이 없을 때의 안전 기본치만 선언 */
-  --sticky-toolbar: 56px;
-  --sticky-filters: 72px;   /* 칩 2~3줄 가정 */
-  --sticky-offset: calc(var(--sticky-toolbar) + var(--sticky-filters));
+  --bg:#ffffff;
+  --surface:#f7f9fc;
+  --text:#1f2430;
+  --muted:#5e6b8a;
+  --line:#e3e6ef;
+  --primary:#1158d3;
+  --primary-ink:#ffffff;
+  --primary-weak:#e7f0ff;
+  --radius-lg:16px;
+  --radius-md:12px;
+  --radius-sm:8px;
+  --shadow-1:0 1px 2px rgba(0,0,0,.06), 0 1px 6px rgba(0,0,0,.03);
+  --font-sans: "Noto Sans KR", Pretendard, system-ui, sans-serif;
+  --sticky-toolbar:56px;
+  --sticky-filters:72px;
+  --sticky-offset:calc(var(--sticky-toolbar) + var(--sticky-filters));
 }
 
-/* 제목 정렬(공공 UX): 데스크톱 센터, 모바일 좌측 */
-header{ text-align:center; border-bottom:1px solid var(--line); padding-bottom:12px; }
-@media (max-width:640px){ header{ text-align:left; } }
+/* 다크모드 */
+html[data-theme="dark"]{
+  --bg:#121417;
+  --surface:#1b1f25;
+  --text:#e4e7ec;
+  --muted:#8891a1;
+  --line:#2b303a;
+  --primary:#6ea8ff;
+  --primary-ink:#0c1b33;
+  --primary-weak:#10315c;
+}
 
-/* 검색/필터 고정 */
-.toolbar{ position:sticky; top:0; z-index:30; background:var(--bg); border-bottom:1px solid var(--line); }
-.filters{ position:sticky; top:var(--sticky-toolbar); z-index:20; background:var(--bg); border-bottom:1px solid var(--line); }
+/* ---------- Layout Basics ---------- */
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.45;
+}
+.wrap{ max-width:1080px; margin:0 auto; padding:6px 18px 40px; }
 
-/* 테이블 헤더는 '합산 오프셋'으로 정확히 고정 */
+/* ---------- Header ---------- */
+header{
+  text-align:center;
+  border-bottom:1px solid var(--line);
+  padding:14px 18px 12px;
+  margin-bottom:6px;
+}
+.title{ font-size:26px; font-weight:800; margin:0; }
+.sub{ color:var(--muted); font-size:14px; }
+@media(max-width:640px){
+  header{ text-align:left; }
+}
+
+/* ---------- Toolbar ---------- */
+.toolbar{
+  position:sticky;
+  top:0;
+  z-index:30;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:10px 0;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+}
+.toolbar input[type="search"]{
+  flex:1;
+  height:38px;
+  padding:0 10px;
+  border-radius:8px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text);
+}
+
+/* Buttons */
+.btn{
+  padding:0 14px;
+  height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  cursor:pointer;
+}
+.btn.primary{
+  background:var(--primary);
+  color:var(--primary-ink);
+  border-color:var(--primary);
+}
+
+/* ---------- Filters ---------- */
+.filters{
+  position:sticky;
+  top:var(--sticky-toolbar);
+  z-index:20;
+  background:var(--bg);
+  padding:10px 0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  border-bottom:1px solid var(--line);
+}
+.chip{
+  padding:6px 12px;
+  background:var(--surface);
+  border-radius:100px;
+  border:1px solid var(--line);
+  font-size:14px;
+  cursor:pointer;
+}
+.chip.active{
+  background:var(--primary-weak);
+  border-color:var(--primary);
+  color:var(--primary);
+}
+
+/* ---------- Table ---------- */
+table{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:12px;
+  border-spacing:0;
+  overflow:hidden;
+}
 thead th{
-  position: sticky;
-  top: var(--sticky-offset) !important;
-  z-index: 10;
-  background: var(--primary) !important;
-  color: var(--primary-ink);
+  position:sticky;
+  top:var(--sticky-offset);
+  background:var(--primary);
+  color:white;
+  padding:10px;
+  font-size:15px;
+  z-index:10;
 }
+tbody td{
+  border-top:1px solid var(--line);
+  padding:12px;
+  font-size:15px;
+}
+tbody tr:hover td{ background:rgba(17,88,211,0.06); }
 
-/* 페이지네이션 가로 정렬 재보장 */
-.footer > div:last-child{ display:inline-flex; align-items:center; gap:8px; }
+td .row-actions{ display:flex; flex-direction:column; gap:6px; }
+
+/* ---------- Footer ---------- */
+.footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-top:14px;
+}
+.footer > div:last-child{ display:flex; gap:8px; }
+
+/* ---------- Mobile ---------- */
+@media(max-width:640px){
+  :root{ --sticky-filters:118px; }
+  .row-actions{
