@@ -57,12 +57,38 @@ header{ text-align:center; border-bottom:1px solid var(--line); padding:14px 18p
 .btn.primary{ background:var(--primary); color:var(--primary-ink); border-color:var(--primary); }
 .btn.ghost{ background:transparent; }
 
+/* 복사 버튼 */
+.btn.copy{
+  border-color: var(--primary);
+  color: var(--primary);
+  background: transparent;
+  font-weight: 800;
+}
+.btn.copy:hover{
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+}
+
+/* 토스트 알림 */
+#toast{
+  position: fixed; left: 50%; bottom: 24px;
+  transform: translateX(-50%) scale(.98);
+  background: var(--text); color: var(--bg);
+  padding: 10px 14px; border-radius: 999px;
+  font-size: 14px; font-weight: 700;
+  box-shadow: var(--shadow-1);
+  opacity: 0; pointer-events: none; transition: .18s ease;
+  z-index: 1000;
+}
+#toast.show{ opacity: 1; transform: translateX(-50%) scale(1); }
+
 /* ---------- Filters (sticky) ---------- */
 .filters{
-  position:sticky; top:var(--sticky-toolbar); z-index:20;
+  position:sticky; top:var(--sticky-toolbar); z-index:40;
   display:flex; flex-wrap:wrap; gap:8px; padding:10px 0; margin:0 0 10px;
   background:var(--bg); border-bottom:1px solid var(--line);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 70%, transparent);
 }
+.filters::after{ content:""; display:block; height:12px; } /* 태그 아래 간격 */
 .chip{
   padding:6px 12px; border-radius:999px; border:1px solid var(--line);
   background:var(--surface); cursor:pointer; white-space:nowrap;
@@ -73,7 +99,7 @@ header{ text-align:center; border-bottom:1px solid var(--line); padding:14px 18p
    LIST MODE (Table → Card List)
    ======================================================================= */
 
-/* 테이블 바깥 박스는 투명 처리 (리스트 컨테이너 역할만) */
+/* 테이블 컨테이너만 유지 */
 table{
   width:100%;
   border:none !important;
@@ -82,9 +108,7 @@ table{
   box-shadow:none !important;
   border-spacing:0;
 }
-
-/* 헤더는 숨김(리스트형에서는 불필요) */
-thead{ display:none !important; }
+thead{ display:none !important; }  /* 리스트형: 헤더 숨김 */
 
 /* 리스트 컨테이너 */
 tbody{
@@ -103,6 +127,7 @@ tbody tr{
   background:var(--bg);
   box-shadow:var(--shadow-1);
   overflow:hidden;
+  scroll-margin-top: calc(var(--sticky-toolbar) + var(--sticky-filters) + 12px);
 }
 
 /* 셀 스타일 */
@@ -120,23 +145,20 @@ td[data-h="#"]{
   color:var(--muted);
   font-weight:800;
   background:color-mix(in oklab, var(--primary-weak) 30%, transparent);
+  font-size:13px;
 }
 
 /* 텍스트 */
-.q{ font-weight:800; letter-spacing:-.2px; }
+.q{ font-weight:800; letter-spacing:-.2px; margin:0 0 6px; font-size:16px; line-height:1.5; }
 .cat{
-  margin-left:8px; font-size:12px; color:var(--muted);
+  display:inline-block; margin-left:8px; margin-top:4px; font-size:12px; color:var(--muted);
   border:1px solid var(--line); padding:2px 8px; border-radius:999px; white-space:nowrap;
 }
-.resp{ white-space:pre-wrap; word-break:keep-all; }
+.resp{ white-space:pre-wrap; word-break:keep-all; line-height:1.55; }
 
-/* 카드 안 버튼 묶음 */
-td .row-actions{
-  display:grid !important;
-  grid-template-columns:1fr;
-  gap:8px;
-}
-td .row-actions .btn{ width:100%; }
+/* 카드 내 버튼 묶음 */
+td .row-actions{ display:grid !important; grid-template-columns:1fr; gap:10px; }
+td .row-actions .btn{ width:100%; min-height:40px; }
 
 /* 호버 효과 */
 tbody tr:hover{
@@ -163,12 +185,13 @@ tbody tr:hover{
   tbody td:nth-child(2){ grid-area:q; }     /* 민원 사례 */
   tbody td:nth-child(3){ grid-area:a; }     /* 가이드 */
   tbody td:nth-child(4){ grid-area:act; }   /* 버튼 */
-  td .row-actions{ grid-template-columns:1fr 1fr; }
+  td .row-actions{ grid-template-columns:1fr; }
 }
 
 /* 640px 이하: 세로 스택 + 버튼 1열, sticky 높이 여유 */
 @media (max-width:640px){
-  :root{ --sticky-filters:118px; }          /* 칩 3줄까지 안전치 */
+  :root{ --sticky-filters:118px; }
+  .filters::after{ height:10px; }           /* 모바일은 간격 축소 */
   tbody tr{
     grid-template-columns:40px 1fr;
     grid-template-areas:
@@ -180,181 +203,3 @@ tbody tr:hover{
   td .row-actions{ grid-template-columns:1fr; }
   .q, .resp{ font-size:14px; }
 }
-
-/* =========================
-   LIST MODE (scoped by body.list-mode)
-   ========================= */
-
-/* 헤더/테이블 기본 규칙과 충돌 방지: 'list-mode'에서만 적용 */
-body.list-mode table{
-  width:100%;
-  border:none !important;
-  background:transparent !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-  border-spacing:0;
-}
-
-body.list-mode thead{ display:none !important; }
-body.list-mode thead th{
-  position:static !important;
-  top:auto !important;
-  background:transparent !important;
-  color:inherit !important;
-  padding:0 !important;
-  box-shadow:none !important;
-  z-index:auto !important;
-}
-
-/* 리스트 컨테이너 */
-body.list-mode tbody{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-/* 공통 카드 스타일 */
-body.list-mode tbody tr{
-  display:grid;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:var(--bg);
-  box-shadow:var(--shadow-1);
-  overflow:hidden;
-}
-body.list-mode tbody td{
-  border:none !important;
-  padding:14px 16px !important;
-  background:transparent !important;
-  font-size:15px;
-}
-
-/* 번호 칸 */
-body.list-mode td[data-h="#"]{
-  text-align:center;
-  color:var(--muted);
-  font-weight:800;
-  background:color-mix(in oklab, var(--primary-weak) 30%, transparent);
-}
-
-/* 버튼 묶음 */
-body.list-mode td .row-actions{
-  display:grid !important;
-  grid-template-columns:1fr;
-  gap:8px;
-}
-body.list-mode td .row-actions .btn{ width:100%; }
-
-/* Hover */
-body.list-mode tbody tr:hover{
-  box-shadow:0 2px 12px rgba(0,0,0,.06);
-  border-color:color-mix(in oklab, var(--primary) 30%, var(--line));
-}
-
-/* ===== 레이아웃: 모바일 기본 1열 스택 ===== */
-body.list-mode tbody tr{
-  grid-template-columns:40px 1fr;
-  grid-template-areas:
-    "no  q"
-    "no  a"
-    "no  act";
-}
-body.list-mode td[data-h="#"]{ grid-area:no; width:40px !important; padding:12px 8px !important; }
-body.list-mode tbody td:nth-child(2){ grid-area:q; }    /* 민원 사례 */
-body.list-mode tbody td:nth-child(3){ grid-area:a; }    /* 가이드 */
-body.list-mode tbody td:nth-child(4){ grid-area:act; }  /* 의견 버튼 */
-
-/* 텍스트 줄바꿈 */
-body.list-mode .q, body.list-mode .resp{
-  white-space:normal !important;
-  word-break:keep-all;
-  overflow-wrap:anywhere;
-}
-
-/* ===== 데스크톱(>= 960px): 4열 카드 ===== */
-@media (min-width: 960px){
-  body.list-mode tbody tr{
-    grid-template-columns:56px 1fr 1fr 220px;
-    grid-template-areas:"no q a act";
-  }
-  body.list-mode td[data-h="#"]{ width:56px !important; }
-  body.list-mode td .row-actions{ grid-template-columns:1fr; }
-}
-
-/* =========================
-   1) 필터(태그) 아래로 콘텐츠가 파고드는 문제 방지
-   - sticky 상태에서도 항상 하단 여백이 유지되도록 pseudo spacer 사용
-   ========================= */
-.filters{
-  z-index: 40;                 /* 카드 위로 안전하게 */
-  border-bottom: 1px solid var(--line);
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 70%, transparent);
-}
-.filters::after{
-  content: "";
-  display: block;
-  height: 12px;                /* ← 이 값이 '태그 아래 간격' */
-}
-
-/* 스크롤 위치 보정: 카드가 sticky 영역에 가려지지 않게 */
-body.list-mode tbody tr{
-  scroll-margin-top: calc(var(--sticky-toolbar) + var(--sticky-filters) + 12px);
-}
-
-/* =========================
-   2) 카드형 UI 가독성/밀도 개선
-   ========================= */
-
-/* 카드 기본 여백과 그리드 간격 */
-body.list-mode tbody tr{
-  gap: 0 8px;                  /* 열 간격 소폭 확보 */
-}
-
-/* 번호 칸(더 콤팩트) */
-body.list-mode td[data-h="#"]{
-  font-size: 13px;
-}
-
-/* 질문(민원 사례) 강조 + 하단 여백 */
-body.list-mode .q{
-  margin: 0 0 6px;
-  font-size: 16px;
-  line-height: 1.5;
-}
-body.list-mode .cat{
-  display: inline-block;
-  margin-top: 4px;
-}
-
-/* 가이드 본문 가독성 */
-body.list-mode .resp{
-  line-height: 1.55;
-}
-
-/* 카드 내 버튼 영역: 버튼 사이 간격/정렬 */
-body.list-mode td .row-actions{
-  gap: 10px;
-}
-body.list-mode td .row-actions .btn{
-  min-height: 40px;
-  font-weight: 700;
-}
-
-/* =========================
-   3) 반응형 미세 조정
-   ========================= */
-@media (max-width: 960px){
-  /* 버튼 2개가 옆으로 너무 넓으면 자동으로 아래로 줄바꿈되지 않게 */
-  body.list-mode td .row-actions{ grid-template-columns: 1fr; }
-}
-
-@media (max-width: 640px){
-  /* 모바일에서 칩이 2~3줄일 때도 겹침 방지 (이미 JS 보정이 있더라도 안전 여유) */
-  :root{ --sticky-filters: 118px; }
-  .filters::after{ height: 10px; }  /* 모바일은 간격 약간 축소 */
-
-  /* 카드 내부 여백 살짝 축소 */
-  body.list-mode tbody td{ padding: 12px 14px !important; }
-  body.list-mode .q{ font-size: 15px; }
-}
-
