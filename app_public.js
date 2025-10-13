@@ -205,6 +205,9 @@ const CASES = [
 
 /* ---------- 실행(DOMContentLoaded 보장) ---------- */
 document.addEventListener('DOMContentLoaded', () => {
+   
+  // ✅ 리스트 UI 모드 활성화 (추가 코드)
+document.body.classList.add('list-mode');
   /* 요소 수집 */
   const els = {
     search: document.getElementById('search'),
