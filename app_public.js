@@ -351,34 +351,6 @@ ${row.a}
     window.open(ghIssuesListURL(), '_blank','noopener');
   });
 
-   /* ==== Sticky 오프셋을 '실제 렌더링 높이'로 자동 계산 ==== */
-function updateStickyOffset(){
-  const root = document.documentElement;
-  const tb = document.querySelector('.toolbar');
-  const fl = document.querySelector('.filters');
-  const tbH = tb ? Math.ceil(tb.getBoundingClientRect().height) : 0;
-  const flH = fl ? Math.ceil(fl.getBoundingClientRect().height) : 0;
-  root.style.setProperty('--sticky-toolbar', tbH + 'px');
-  root.style.setProperty('--sticky-filters', flH + 'px');
-  root.style.setProperty('--sticky-offset', (tbH + flH) + 'px');
-}
-
-/* ① 초기 로드 직후 */
-document.addEventListener('DOMContentLoaded', () => {
-  updateStickyOffset();
-
-  /* ② 리사이즈/줌/폰트변경 등 레이아웃 변동 대응 */
-  window.addEventListener('resize', updateStickyOffset);
-
-  /* ③ 툴바/필터 높이가 바뀌는 경우(칩 줄수 변화 등) 자동 감지 */
-  const ro = new ResizeObserver(updateStickyOffset);
-  const tb = document.querySelector('.toolbar');
-  const fl = document.querySelector('.filters');
-  if (tb) ro.observe(tb);
-  if (fl) ro.observe(fl);
-});
-
-
   /* 시작 */
   renderChips();
   render();
