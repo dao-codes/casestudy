@@ -1,0 +1,38 @@
+name: Feedback
+description: 센터 현장 의견/보완 제안
+labels: ["feedback"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: 카테고리
+      options:
+        - 운영시간/공간
+        - 선발/절차
+        - 개인정보/마케팅
+        - 프로그램 품질
+        - 공정성/청렴성
+        - 상담
+        - 연락/소통
+        - 자료/콘텐츠
+        - 공간/환경
+        - 일정/기한
+        - 기관 신뢰성
+        - 참여 자격
+        - 리워드/경품
+        - 보안/시스템
+        - 기타
+    validations:
+      required: true
+  - type: input
+    id: subject
+    attributes:
+      label: 한 줄 요약
+      placeholder: 예) 마감 시간이 헷갈립니다
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: 상세 내용
+      description: 상황/기대/불편/개선 제안 등을 자유롭게 작성해 주세요.

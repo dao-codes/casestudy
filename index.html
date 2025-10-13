@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="app-id" content="impact-share-center-public">
+<!-- GitHub Issues 연동 메타: dao-codes/Impact 저장소로 지정 -->
+<meta name="gh-owner" content="dao-codes">
+<meta name="gh-repo" content="Impact">
+<meta name="gh-label" content="feedback">
+<title>청년센터 컴플레인 사례집 – Public</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./app_public.css" />
+</head>
+<body>
+<header>
+  <div>
+    <h1 class="title">청년센터 컴플레인 사례집 <small class="sub">Public · GitHub Issues 연동</small></h1>
+    <div class="sub">검색/필터 · 라이트/다크 · GitHub 이슈로 의견 수집(댓글/게시판)</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="toolbar">
+    <input id="search" type="search" placeholder='검색 (예: 카테고리:"상담" -키워드:"주말" 개인정보)' aria-label="검색어">
+    <button id="toggleTheme" class="btn ghost" type="button">테마 전환</button>
+    <button id="openIssues" class="btn" type="button">이슈 현황 보기</button>
+  </div>
+
+  <div id="chips" class="filters"></div>
+
+  <table>
+    <thead>
+      <tr><th style="width:58px">#</th><th>민원 사례</th><th style="width:26%">가이드</th><th style="width:180px">의견</th></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <div class="footer">
+    <div class="count">표시 <b id="shown">0</b> · 전체 <b id="total">0</b></div>
+    <div>
+      <button id="prev" class="row-actions btn" type="button">이전</button>
+      <span id="pageInfo">1/1</span>
+      <button id="next" class="row-actions btn" type="button">다음</button>
+      <select id="pageSize" aria-label="페이지 크기" style="margin-left:8px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:transparent;color:var(--text)">
+        <option>25</option><option selected>50</option><option>100</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<script src="./app_public.js"></script>
+</body>
+</html>
