@@ -1,356 +1,318 @@
-/* ==========================================================================
-   app_public.css  — Material Design 3 (MD3) flavored styles for Impact app
-   - Works with existing HTML structure (toolbar, chips, table, .btn variants)
-   - Light/Dark themes via [data-theme="auto"|"dark"] on <html>
-   - Components: Containers, Top App Bar, Buttons (filled/tonal/outlined/text),
-                 Filter chips, Table, Pagination, Focus rings, Elevations
-   ========================================================================== */
+/* =========================================================================
+  app_public.css — Compact + Responsive (Material-ish)
+  - 간격 정돈: 행/칩/도구모음 여백 최소화
+  - 모바일: 글자/패딩 축소 + 표 가로 스크롤(깨짐 방지)
+  - 라이트/다크 자동 지원(data-theme="auto" + prefers-color-scheme)
+  ======================================================================= */
 
-/* ========= MD3 Design Tokens (Light) ===================================== */
-:root{
-  /* --- Color System (MD3-like) --- */
-  --md-sys-color-primary:        #0B57D0; /* brand */
-  --md-sys-color-on-primary:     #FFFFFF;
-  --md-sys-color-primary-container:#DCE2FF;
-  --md-sys-color-on-primary-container:#002A78;
+/* ---------- Design tokens ---------- */
+:root {
+  --bg: #ffffff;
+  --surface: #f7f9fc;
+  --text: #1f2430;
+  --muted: #5e6b8a;
+  --line: #e3e6ef;
 
-  --md-sys-color-secondary:      #5C6B8B;
-  --md-sys-color-on-secondary:   #FFFFFF;
-  --md-sys-color-secondary-container:#DEE3F3;
-  --md-sys-color-on-secondary-container:#131C2B;
+  --primary: #1158d3;      /* Material Blue500 근사 */
+  --primary-ink: #ffffff;
+  --primary-weak: #e7f0ff;
 
-  --md-sys-color-surface:        #FFFFFF;
-  --md-sys-color-surface-variant:#E3E8F1;
-  --md-sys-color-on-surface:     #0F172A;
-  --md-sys-color-on-surface-variant:#445063;
+  --danger: #b3261e;
 
-  --md-sys-color-background:     #F5F7FB;
-  --md-sys-color-outline:        #CBD5E1;
-  --md-sys-color-outline-variant:#D9E0EB;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
 
-  --md-sys-color-error:          #B3261E;
-  --md-sys-color-on-error:       #FFFFFF;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.06), 0 1px 6px rgba(0,0,0,.03);
 
-  /* --- Elevation (shadow) --- */
-  --md-elevation-0:  none;
-  --md-elevation-1:  0 1px 2px rgba(0,0,0,.08);
-  --md-elevation-2:  0 2px 6px rgba(0,0,0,.10);
-  --md-elevation-3:  0 4px 12px rgba(0,0,0,.12);
-  --md-elevation-4:  0 8px 20px rgba(0,0,0,.14);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+               Roboto, "Noto Sans KR", "Apple SD Gothic Neo",
+               "Pretendard Variable", "Segoe UI", Arial, "Helvetica Neue", sans-serif;
 
-  /* --- Shape (radius) --- */
-  --md-shape-corner-small:   8px;
-  --md-shape-corner-medium:  12px;
-  --md-shape-corner-large:   16px;
-  --md-shape-corner-xl:      20px;
-  --md-shape-corner-xxl:     28px; /* for chips */
+  /* Compact spacing */
+  --pad-outer: 18px;        /* wrap padding */
+  --row-pad: 10px;          /* table cell padding */
+  --chip-pad: 6px 10px;     /* chip padding */
+  --control-pad: 6px 10px;  /* button/input padding */
+  --gap: 10px;              /* default gap */
+  --gap-lg: 14px;
 
-  /* --- State (hover/pressed/focus) --- */
-  --md-state-hover-opacity:   .08;
-  --md-state-focus-opacity:   .12;
-  --md-state-pressed-opacity: .12;
-
-  /* --- Typography (scale) --- */
-  --md-typescale-title-large-size: 22px;
-  --md-typescale-title-large-line: 28px;
-  --md-typescale-label-large-size: 14px;
-  --md-typescale-label-large-line: 20px;
-  --md-typescale-body-medium-size: 14px;
-  --md-typescale-body-medium-line: 22px;
-
-  /* --- App specific helpers --- */
-  --bg-gradient: linear-gradient(120deg,#eef4ff 0%,#f8fafc 40%,#f6fff7 100%);
-  --brand: var(--md-sys-color-primary);
-  --paper: var(--md-sys-color-surface);
-  --text:  var(--md-sys-color-on-surface);
-  --muted: #64748B; /* on-surface-variant-ish */
-  --line:  var(--md-sys-color-outline);
+  --h1: 24px;
+  --text-sm: 13px;
+  --text-xs: 12px;
 }
 
-/* ========= MD3 Design Tokens (Dark) ====================================== */
-:root[data-theme="dark"]{
-  --md-sys-color-primary:        #9BC0FF;
-  --md-sys-color-on-primary:     #062859;
-  --md-sys-color-primary-container:#14386E;
-  --md-sys-color-on-primary-container:#DCE6FF;
-
-  --md-sys-color-secondary:      #A8B4CC;
-  --md-sys-color-on-secondary:   #223047;
-  --md-sys-color-secondary-container:#2B3A53;
-  --md-sys-color-on-secondary-container:#DDE6F7;
-
-  --md-sys-color-surface:        #0F172A;
-  --md-sys-color-surface-variant:#1F2937;
-  --md-sys-color-on-surface:     #E5E7EB;
-  --md-sys-color-on-surface-variant:#B7C2D6;
-
-  --md-sys-color-background:     #0a1223;
-  --md-sys-color-outline:        #334155;
-  --md-sys-color-outline-variant:#2B3648;
-
-  --bg-gradient: linear-gradient(120deg,#0a1223 0%,#0f172a 40%,#061a12 100%);
-  --brand: var(--md-sys-color-primary);
-  --paper: var(--md-sys-color-surface);
-  --text:  var(--md-sys-color-on-surface);
-  --muted: var(--md-sys-color-on-surface-variant);
-  --line:  var(--md-sys-color-outline);
-}
-
-/* ========= Reset & Base =================================================== */
-*{ box-sizing: border-box; }
-html,body{ height:100%; }
-body{
-  margin:0;
-  font-family: "Pretendard","맑은 고딕", system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Malgun Gothic, sans-serif;
-  color: var(--text);
-  background: var(--bg-gradient);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-a{ color: inherit; text-decoration: none; }
-button{ font: inherit; color: inherit; background: none; border: none; padding: 0; }
-
-/* ========= Top Section (Title) =========================================== */
-header{
-  display:flex; gap:12px; align-items:center;
-  padding:20px 20px 8px;
-  max-width:1100px; margin:0 auto;
-}
-.title{
-  margin:0;
-  color: var(--brand);
-  font-weight:700;
-  font-size: var(--md-typescale-title-large-size);
-  line-height: var(--md-typescale-title-large-line);
-}
-.sub{ color: var(--muted); font-size:12px; }
-
-/* ========= Surface Container ============================================= */
-.wrap{
-  max-width:1100px; margin:12px auto 80px;
-  background: color-mix(in oklab, var(--paper) 90%, transparent);
-  border: 1px solid var(--line);
-  border-radius: var(--md-shape-corner-large);
-  box-shadow: var(--md-elevation-1);
-  backdrop-filter: blur(8px);
-  overflow: hidden;
-}
-
-/* ========= Top App Bar / Toolbar ========================================= */
-.toolbar{
-  display:flex; gap:8px; flex-wrap:wrap;
-  padding:12px 16px;
-  border-bottom:1px solid var(--line);
-  background: var(--paper);
-  position: sticky; top:0; z-index:5;
-}
-.toolbar input[type="search"]{
-  flex:1 1 320px; min-width:220px;
-  border:1px solid var(--line);
-  border-radius: var(--md-shape-corner-medium);
-  padding:10px 12px;
-  background: transparent;
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
-.toolbar input[type="search"]:focus{
-  border-color: color-mix(in oklab, var(--brand) 40%, var(--line));
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 22%, transparent);
-}
-
-/* ========= Buttons (MD3 variants) ======================================== */
-.btn{
-  --_bg: var(--brand);
-  --_fg: var(--md-sys-color-on-primary);
-  --_shadow: var(--md-elevation-1);
-  display:inline-flex; align-items:center; justify-content:center;
-  gap:8px; cursor:pointer; user-select:none; position:relative;
-  background: var(--_bg); color: var(--_fg);
-  border: 1px solid transparent;
-  border-radius: var(--md-shape-corner-medium);
-  padding:10px 12px;
-  min-height: 40px;
-  font-weight:600; letter-spacing:.01em;
-  transition: transform .02s ease, box-shadow .2s, background-color .15s, border-color .15s, color .15s;
-  box-shadow: var(--_shadow);
-}
-.btn:hover{ filter: brightness(1.02); }
-.btn:active{ transform: translateY(1px); }
-
-/* Ripple-like feedback (pure CSS approx.) */
-.btn::after{
-  content:""; position:absolute; inset:0; border-radius: inherit;
-  background: radial-gradient(120px 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,.22), transparent 40%);
-  opacity:0; transition: opacity .35s ease;
-}
-.btn:active::after{ opacity: .6; transition: opacity .05s ease; }
-/* Track pointer for ripple origin */
-.btn{ --x:50%; --y:50%; }
-.btn:where(:hover,:focus-visible){ outline: none; }
-.btn:focus-visible{ box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 25%, transparent); }
-
-/* Variant: ghost (used as "theme toggle") → MD3 text button 느낌 */
-.btn.ghost{
-  --_bg: transparent;
-  --_fg: var(--brand);
-  --_shadow: var(--md-elevation-0);
-  background: transparent; color: var(--brand);
-  border: 1px solid color-mix(in oklab, var(--brand) 22%, var(--line));
-}
-.btn.ghost:hover{
-  background: color-mix(in oklab, var(--brand) var(--md-state-hover-opacity*100,8%), transparent);
-  border-color: color-mix(in oklab, var(--brand) 30%, var(--line));
-}
-
-/* Variant: tonal (secondary container) */
-.btn.tonal{
-  --_bg: var(--md-sys-color-secondary-container);
-  --_fg: var(--md-sys-color-on-secondary-container);
-  --_shadow: var(--md-elevation-0);
-  border: 1px solid color-mix(in oklab, var(--md-sys-color-secondary) 12%, var(--md-sys-color-secondary-container));
-}
-
-/* Variant: outlined */
-.btn.outlined{
-  --_bg: transparent;
-  --_fg: var(--text);
-  --_shadow: var(--md-elevation-0);
-  background: transparent;
-  border: 1px solid var(--line);
-}
-.btn.outlined:hover{
-  background: color-mix(in oklab, var(--brand) var(--md-state-hover-opacity*100,8%), transparent);
-  border-color: color-mix(in oklab, var(--brand) 24%, var(--line));
-}
-
-/* ========= Filter Chips =================================================== */
-.filters{
-  display:flex; flex-wrap:wrap; gap:6px;
-  padding:10px 16px;
-  border-bottom:1px solid var(--line);
-  background: var(--paper);
-}
-.chip{
-  padding: 6px 12px;
-  border-radius: var(--md-shape-corner-xxl);
-  background: color-mix(in oklab, var(--brand) 10%, var(--paper));
-  color: var(--text);
-  cursor:pointer;
-  border:1px solid var(--line);
-  font-size: 12px;
-  line-height: 18px;
-  transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s;
-}
-.chip:hover{
-  background: color-mix(in oklab, var(--brand) 16%, var(--paper));
-  border-color: color-mix(in oklab, var(--brand) 24%, var(--line));
-}
-.chip.active{
-  background: var(--brand);
-  color: var(--md-sys-color-on-primary);
-  border-color: transparent;
-  box-shadow: var(--md-elevation-1);
-}
-
-/* ========= Table (Data view) ============================================= */
-table{ width:100%; border-collapse:collapse; }
-th,td{
-  border-top:1px solid var(--line);
-  padding:12px;
-  vertical-align:top;
-  font-size: var(--md-typescale-body-medium-size);
-  line-height: var(--md-typescale-body-medium-line);
-  color: var(--text);
-}
-thead th{
-  background: var(--brand);
-  color: var(--md-sys-color-on-primary);
-  position: sticky; top:62px; z-index:4;
-  text-align:left; font-weight:700;
-}
-tbody tr:nth-child(even){
-  background: color-mix(in oklab, var(--md-sys-color-surface-variant) 12%, transparent);
-}
-.q{ font-weight: 700; }
-.cat{
-  display:inline-flex; gap:6px; align-items:center;
-  border:1px solid var(--line);
-  border-radius: var(--md-shape-corner-xxl);
-  padding: 2px 8px;
-  font-size: 12px; margin-left: 6px;
-  color: var(--md-sys-color-on-surface-variant);
-  background: color-mix(in oklab, var(--md-sys-color-surface-variant) 26%, transparent);
-}
-.resp{ color:#111827; }
-:root[data-theme="dark"] .resp{ color:#e5e7eb; }
-
-/* ========= Row Actions / Pagination ====================================== */
-.row-actions{ display:flex; gap:8px; flex-wrap:wrap; }
-.row-actions .btn{
-  background: var(--paper); color: var(--text);
-  border: 1px solid var(--line);
-  box-shadow: var(--md-elevation-0);
-}
-.row-actions .btn.primary{
-  background: var(--brand);
-  color: var(--md-sys-color-on-primary);
-  border-color: transparent;
-  box-shadow: var(--md-elevation-1);
-}
-.footer{
-  padding:12px 16px;
-  border-top:1px solid var(--line);
-  display:flex; justify-content:space-between; align-items:center;
-  background: var(--paper);
-  color: var(--muted);
-}
-.count b{ color: var(--brand); }
-
-/* ========= Form Controls: Select ========================================= */
-select{
-  border:1px solid var(--line);
-  border-radius: var(--md-shape-corner-small);
-  padding: 8px 10px;
-  background: transparent;
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
-select:focus{
-  border-color: color-mix(in oklab, var(--brand) 40%, var(--line));
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 22%, transparent);
-}
-
-/* ========= Utilities ====================================================== */
-mark{ background: #fff3b0; }
-[hidden]{ display:none !important; }
-
-/* ========= Responsive (Mobile) =========================================== */
-@media (max-width: 860px){
-  table, thead, tbody, th, td, tr{ display:block; }
-  thead{ display:none; }
-  tr{ border-top:1px solid var(--line); padding:12px; }
-  td{ border:none; padding:6px 0; }
-  td[data-h]::before{
-    content: attr(data-h);
-    display:block; font-weight:700; margin-bottom:4px;
-    color: var(--md-sys-color-on-surface-variant);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121417;
+    --surface: #0e1114;
+    --text: #e6ebf5;
+    --muted: #a9b2c6;
+    --line: #232833;
+    --primary: #6aa7ff;
+    --primary-ink: #0a1221;
+    --primary-weak: #0f264a;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.5), 0 1px 8px rgba(0,0,0,.35);
   }
 }
 
-/* ========= Pointer position for ripple =================================== */
-.btn{
-  /* set custom properties on pointer move for ripple origin */
-}
-.btn:hover, .btn:active{
-  /* JS sets --x, --y on pointer events if desired; otherwise center */
+/* Dark toggle (optional explicit) */
+html[data-theme="dark"] {
+  --bg: #121417;
+  --surface: #0e1114;
+  --text: #e6ebf5;
+  --muted: #a9b2c6;
+  --line: #232833;
+  --primary: #6aa7ff;
+  --primary-ink: #0a1221;
+  --primary-weak: #0f264a;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.5), 0 1px 8px rgba(0,0,0,.35);
 }
 
-/* ========= Compact Density (optional) ==================================== */
-@media (max-height: 740px){
-  .toolbar{ padding:8px 12px; }
-  .toolbar input[type="search"]{ padding:8px 10px; }
-  .btn{ min-height:36px; padding:8px 10px; }
-  th,td{ padding:10px; }
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+header {
+  padding: 18px var(--pad-outer) 6px;
+}
+.title {
+  margin: 0 0 6px;
+  font-size: var(--h1);
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.sub { color: var(--muted); font-size: var(--text-sm); }
+
+.wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 var(--pad-outer) 40px;
+}
+
+/* ---------- Toolbar ---------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  margin: 8px 0 12px;
+  flex-wrap: wrap;
+}
+input[type="search"]{
+  flex: 1 1 480px;
+  min-width: 240px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  padding: var(--control-pad);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+input[type="search"]::placeholder{ color: var(--muted); }
+input[type="search"]:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+}
+.btn:disabled{ opacity: .5; cursor: not-allowed; }
+.btn:hover{ filter: brightness(1.02); }
+.btn.primary{
+  background: var(--primary);
+  color: var(--primary-ink);
+  border-color: color-mix(in oklab, var(--primary) 75%, black);
+}
+.btn.ghost{
+  background: transparent;
+  border-color: var(--line);
+}
+.btn.outlined{
+  background: transparent;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ---------- Chips (filters) ---------- */
+.filters{
+  display:flex; flex-wrap:wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.chip{
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  padding: var(--chip-pad);
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+}
+.chip:hover{ border-color: var(--primary); }
+.chip.active{
+  background: var(--primary-weak);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ---------- Table ---------- */
+table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+}
+thead th{
+  position: sticky; top: 0; z-index: 2;
+  background: var(--primary);
+  color: var(--primary-ink);
+  text-align: left;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: .1px;
+  padding: 12px;
+}
+tbody td{
+  padding: var(--row-pad) 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  font-size: 14px;
+}
+tbody tr:last-child td{ border-bottom: none; }
+tbody tr:hover td{ background: color-mix(in oklab, var(--primary-weak) 70%, transparent); }
+
+td[data-h="#"]{ width: 62px; color: var(--muted); font-weight: 700; }
+
+.q{
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.cat{
+  margin-left: 8px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  background: color-mix(in oklab, var(--line) 70%, transparent);
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.resp{
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.row-actions{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+/* ---------- Footer ---------- */
+.footer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  margin: 12px 0 0;
+  font-size: var(--text-sm);
+}
+.count b{ color: var(--primary); }
+
+/* ---------- Utilities ---------- */
+mark{
+  background: color-mix(in oklab, var(--primary) 25%, transparent);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 4px;
+}
+
+/* ---------- Responsive (<= 960px) ---------- */
+@media (max-width: 960px){
+  :root{
+    --pad-outer: 14px;
+    --row-pad: 9px;
+    --gap: 8px;
+    --gap-lg: 10px;
+  }
+  .title{ font-size: 22px; }
+  thead th{ font-size: 13px; padding: 10px; }
+  tbody td{ font-size: 13px; padding: 9px 10px; }
+  .btn{ height: 34px; padding: 0 10px; font-size: 13px; }
+  .chip{ font-size: 12.5px; }
+}
+
+/* ---------- Responsive (<= 640px) ---------- */
+/* 표를 '가로 스크롤'로 전환하여 깨짐/줄바꿈 문제 방지 */
+@media (max-width: 640px){
+  :root{
+    --pad-outer: 12px;
+    --row-pad: 8px;
+  }
+
+  .toolbar{
+    gap: 8px;
+  }
+  input[type="search"]{ flex-basis: 100%; min-width: 0; }
+
+  /* 테이블은 박스로 감싸지지 않아도 block 처리로 스크롤 가능 */
+  table{ display: block; overflow-x: auto; white-space: nowrap; }
+  thead, tbody, tr{ display: table; width: 100%; table-layout: fixed; }
+
+  /* 열 너비 균형: 번호 좁게, 의견(버튼) 좁게 */
+  td[data-h="#"]{ width: 48px; }
+  tbody td:nth-child(3){ width: 42%; }   /* 가이드 */
+  tbody td:nth-child(4){ width: 160px; } /* 의견 버튼 영역 */
+
+  /* 글자 사이 여백, 줄간격 조정 */
+  .q{ font-size: 13.5px; }
+  .resp{ font-size: 13px; }
+  .cat{ font-size: 11.5px; padding: 1px 7px; }
+
+  .row-actions{ grid-auto-rows: 34px; }
+  .btn{ height: 32px; padding: 0 10px; font-size: 12.5px; }
+  .footer{ flex-wrap: wrap; gap: 8px; }
+  .count{ order: 2; }
+}
+
+/* ---------- Print (선택) ---------- */
+@media print{
+  .toolbar, .filters, .footer { display: none !important; }
+  body { background: #fff; }
+  table { box-shadow: none; border-color: #ddd; }
 }
