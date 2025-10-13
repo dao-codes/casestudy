@@ -1,11 +1,12 @@
 /* =========================================================================
-  app_public.css — Compact + Responsive + Sticky (검색/필터 고정)
-  - 검색/필터 상단 고정(옵션 A)
-  - 간격 정돈 + 모바일 최적화
-  - 라이트/다크 자동 지원(data-theme="auto" + prefers-color-scheme)
+  app_public.css — Light default, Dark on toggle + Sticky/Compact/Responsive
+  - 기본: 라이트(시스템 다크 무시), 버튼으로만 다크 전환 (html[data-theme="dark"])
+  - 상단 검색/필터 sticky, thead sticky 안정화(z-index/배경)
+  - 표 레이아웃/간격 정돈 + 모바일 가로 스크롤
+  - 페이지네이션 가로 정렬 (row-actions 전역 충돌 방지)
   ======================================================================= */
 
-/* ---------- Design tokens ---------- */
+/* ---------- Design tokens (Light default) ---------- */
 :root {
   --bg: #ffffff;
   --surface: #f7f9fc;
@@ -16,8 +17,6 @@
   --primary: #1158d3;
   --primary-ink: #ffffff;
   --primary-weak: #e7f0ff;
-
-  --danger: #b3261e;
 
   --radius-lg: 16px;
   --radius-md: 12px;
@@ -35,34 +34,17 @@
   --chip-pad: 6px 10px;
   --control-pad: 6px 10px;
   --gap: 10px;
-  --gap-lg: 14px;
 
   --h1: 24px;
   --text-sm: 13px;
   --text-xs: 12px;
 
-  /* Sticky heights (옵션 A) — 필요 시 숫자만 조정하면 됩니다. */
-  --toolbar-h: 56px;  /* 검색툴바 예상 높이 */
-  --filters-h: 44px;  /* 필터칩 한 줄 높이(모바일에서 2줄이면 아래 미디어쿼리에서 키움) */
-  --sticky-gap: 8px;  /* 툴바-필터 사이 간격 */
-  --sticky-total: calc(var(--toolbar-h) + var(--filters-h) + var(--sticky-gap));
+  /* Sticky heights */
+  --toolbar-h: 56px;   /* 검색툴바 높이 가이드 */
+  --filters-h: 44px;   /* 필터칩 1줄 기준 높이 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121417;
-    --surface: #0e1114;
-    --text: #e6ebf5;
-    --muted: #a9b2c6;
-    --line: #232833;
-    --primary: #6aa7ff;
-    --primary-ink: #0a1221;
-    --primary-weak: #0f264a;
-    --shadow-1: 0 1px 2px rgba(0,0,0,.5), 0 1px 8px rgba(0,0,0,.35);
-  }
-}
-
-/* Dark toggle (explicit) */
+/* ---------- Dark (toggle only) ---------- */
 html[data-theme="dark"] {
   --bg: #121417;
   --surface: #0e1114;
@@ -70,7 +52,7 @@ html[data-theme="dark"] {
   --muted: #a9b2c6;
   --line: #232833;
   --primary: #6aa7ff;
-  --primary-ink: #0a1221;
+  --primary-ink: #0a1221;    /* 다크에서 버튼 글자 대비 */
   --primary-weak: #0f264a;
   --shadow-1: 0 1px 2px rgba(0,0,0,.5), 0 1px 8px rgba(0,0,0,.35);
 }
@@ -105,10 +87,10 @@ header { padding: 18px var(--pad-outer) 6px; }
   padding: 0 var(--pad-outer) 40px;
 }
 
-/* ---------- Toolbar (검색창/버튼) ---------- */
+/* ---------- Toolbar (검색창/버튼) — Sticky ---------- */
 .toolbar {
   position: sticky;
-  top: 0;                   /* 상단 고정 시작점 */
+  top: 0;
   z-index: 30;
   display: flex;
   align-items: center;
@@ -116,10 +98,8 @@ header { padding: 18px var(--pad-outer) 6px; }
   margin: 8px 0 8px;
   flex-wrap: wrap;
   padding: 8px 0;
-  background: color-mix(in oklab, var(--bg) 90%, transparent);
-  backdrop-filter: saturate(1.2) blur(4px);
+  background: var(--bg);          /* 투명/블러 제거: 겹침/잔상 방지 */
   border-bottom: 1px solid var(--line);
-  /* 고정 높이 가이드(상단 겹침 방지 계산용) */
   min-height: var(--toolbar-h);
 }
 input[type="search"]{
@@ -142,17 +122,13 @@ input[type="search"]:focus{
 /* ---------- Buttons ---------- */
 .btn{
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center; justify-content: center;
   gap: 8px;
-  height: 36px;
-  padding: 0 12px;
+  height: 36px; padding: 0 12px;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-weight: 600;
-  font-size: 14px;
-  background: var(--surface);
-  color: var(--text);
+  font-weight: 700; font-size: 14px;
+  background: var(--surface); color: var(--text);
   box-shadow: var(--shadow-1);
   cursor: pointer;
 }
@@ -166,13 +142,12 @@ input[type="search"]:focus{
 .btn.ghost{ background: transparent; border-color: var(--line); }
 .btn.outlined{ background: transparent; border-color: var(--primary); color: var(--primary); }
 
-/* ---------- Filters (칩) ---------- */
+/* ---------- Filters (칩) — Sticky ---------- */
 .filters{
   position: sticky;
-  top: calc(var(--toolbar-h) + 0px);
+  top: var(--toolbar-h);
   z-index: 20;
-  background: color-mix(in oklab, var(--bg) 92%, transparent);
-  backdrop-filter: saturate(1.2) blur(4px);
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
   display:flex; flex-wrap:wrap;
   gap: 8px;
@@ -195,7 +170,6 @@ input[type="search"]:focus{
   background: var(--primary-weak);
   border-color: var(--primary);
   color: var(--primary);
-  font-weight: 700;
 }
 
 /* ---------- Table ---------- */
@@ -211,9 +185,9 @@ table{
 }
 thead th{
   position: sticky;
-  top: calc(var(--toolbar-h) + var(--filters-h)); /* 고정 영역 높이만큼 보정 */
+  top: calc(var(--toolbar-h) + var(--filters-h)); /* 겹침 보정 */
   z-index: 10;
-  background: var(--primary);
+  background: var(--primary) !important;
   color: var(--primary-ink);
   text-align: left;
   font-weight: 800;
@@ -228,11 +202,11 @@ tbody td{
   font-size: 14px;
 }
 tbody tr:last-child td{ border-bottom: none; }
-tbody tr:hover td{ background: color-mix(in oklab, var(--primary-weak) 70%, transparent); }
+tbody tr:hover td{ background: color-mix(in oklab, var(--primary-weak) 60%, transparent) !important; }
 
 td[data-h="#"]{ width: 62px; color: var(--muted); font-weight: 700; }
 
-.q{ font-weight: 700; letter-spacing: -0.2px; }
+.q{ font-weight: 800; letter-spacing: -0.2px; }
 .cat{
   margin-left: 8px;
   font-size: var(--text-xs);
@@ -245,9 +219,14 @@ td[data-h="#"]{ width: 62px; color: var(--muted); font-weight: 700; }
 }
 .resp{ white-space: pre-wrap; word-break: keep-all; }
 
-.row-actions{ display: grid; grid-template-columns: 1fr; gap: 8px; }
+/* 표 내부 의견 버튼 묶음만 세로 그리드 (전역 충돌 방지) */
+td .row-actions{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
 
-/* ---------- Footer ---------- */
+/* ---------- Footer / Pagination ---------- */
 .footer{
   display: flex;
   align-items: center;
@@ -257,6 +236,24 @@ td[data-h="#"]{ width: 62px; color: var(--muted); font-weight: 700; }
   font-size: var(--text-sm);
 }
 .count b{ color: var(--primary); }
+
+/* 페이지네이션 컨트롤을 가로 정렬 */
+.footer > div:last-child{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#pageInfo{
+  min-width: 36px; text-align: center; color: var(--muted);
+}
+#pageSize{
+  height: 36px; line-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 8px;
+  background: transparent;
+  color: var(--text);
+}
 
 /* ---------- Utilities ---------- */
 mark{
@@ -272,7 +269,6 @@ mark{
     --pad-outer: 14px;
     --row-pad: 9px;
     --gap: 8px;
-    --gap-lg: 10px;
     --toolbar-h: 52px;
     --filters-h: 48px;
   }
@@ -288,22 +284,19 @@ mark{
   :root{
     --pad-outer: 12px;
     --row-pad: 8px;
-    /* 모바일에서 칩이 2줄로 자주 바뀌므로 필터 영역 높이 넉넉히 확보 */
     --toolbar-h: 50px;
-    --filters-h: 80px;   /* 2줄 예상치. 3줄이면 112px 정도로 늘리면 됩니다. */
+    --filters-h: 80px;  /* 칩 2줄 기준. 3줄이면 112px로 확대 */
   }
-
   .toolbar{ gap: 8px; padding: 6px 0; }
   input[type="search"]{ flex-basis: 100%; min-width: 0; }
 
-  /* 테이블은 가로 스크롤 가능 */
+  /* 테이블 가로 스크롤로 전환 */
   table{ display: block; overflow-x: auto; white-space: nowrap; }
   thead, tbody, tr{ display: table; width: 100%; table-layout: fixed; }
 
-  /* 열 너비 균형: 번호 좁게, 의견 좁게 */
   td[data-h="#"]{ width: 48px; }
-  tbody td:nth-child(3){ width: 42%; }   /* 가이드 */
-  tbody td:nth-child(4){ width: 160px; } /* 의견 버튼 영역 */
+  tbody td:nth-child(3){ width: 42%; }    /* 가이드 */
+  tbody td:nth-child(4){ width: 160px; }  /* 의견 버튼 영역 */
 
   .q{ font-size: 13.5px; }
   .resp{ font-size: 13px; }
@@ -311,8 +304,9 @@ mark{
 
   .row-actions{ grid-auto-rows: 34px; }
   .btn{ height: 32px; padding: 0 10px; font-size: 12.5px; }
+
   .footer{ flex-wrap: wrap; gap: 8px; }
-  .count{ order: 2; }
+  .footer > div:last-child{ flex-wrap: nowrap; }
 }
 
 /* ---------- Print ---------- */
@@ -321,48 +315,3 @@ mark{
   body { background: #fff; }
   table { box-shadow: none; border-color: #ddd; }
 }
-
-/* === Fix: 페이지네이션 버튼이 세로로 쌓이는 문제 === */
-
-/* 1) 표 내부(의견 칸)에서만 .row-actions 그리드 적용 */
-td .row-actions{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-
-/* 2) 푸터의 컨트롤 영역을 가로 정렬 */
-.footer > div:last-child{
-  display: inline-flex;       /* 가로로 배치 */
-  align-items: center;
-  gap: 8px;
-}
-
-/* 3) 페이지 정보와 셀렉트 모양 보정 */
-#pageInfo{
-  min-width: 36px;
-  text-align: center;
-  color: var(--muted);
-}
-#pageSize{
-  height: 36px;
-  line-height: 34px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0 8px;
-  background: transparent;
-  color: var(--text);
-}
-
-/* 4) 모바일에서도 가로 정렬 유지 */
-@media (max-width: 640px){
-  .footer{
-    flex-wrap: wrap;
-  }
-  .footer > div:last-child{
-    display: flex;
-    flex-wrap: nowrap;        /* 버튼 줄바꿈 방지 */
-    gap: 8px;
-  }
-}
-
