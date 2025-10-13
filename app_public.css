@@ -50,3 +50,31 @@ thead th{
   align-items: center;
   gap: 8px;
 }
+
+/* ==== Sticky 영역을 '실제 높이'로 자동 보정하는 변수 ==== */
+:root{
+  /* JS가 실측값으로 덮어씀. 값이 없을 때의 안전 기본치만 선언 */
+  --sticky-toolbar: 56px;
+  --sticky-filters: 72px;   /* 칩 2~3줄 가정 */
+  --sticky-offset: calc(var(--sticky-toolbar) + var(--sticky-filters));
+}
+
+/* 제목 정렬(공공 UX): 데스크톱 센터, 모바일 좌측 */
+header{ text-align:center; border-bottom:1px solid var(--line); padding-bottom:12px; }
+@media (max-width:640px){ header{ text-align:left; } }
+
+/* 검색/필터 고정 */
+.toolbar{ position:sticky; top:0; z-index:30; background:var(--bg); border-bottom:1px solid var(--line); }
+.filters{ position:sticky; top:var(--sticky-toolbar); z-index:20; background:var(--bg); border-bottom:1px solid var(--line); }
+
+/* 테이블 헤더는 '합산 오프셋'으로 정확히 고정 */
+thead th{
+  position: sticky;
+  top: var(--sticky-offset) !important;
+  z-index: 10;
+  background: var(--primary) !important;
+  color: var(--primary-ink);
+}
+
+/* 페이지네이션 가로 정렬 재보장 */
+.footer > div:last-child{ display:inline-flex; align-items:center; gap:8px; }
