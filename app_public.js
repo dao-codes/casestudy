@@ -5,6 +5,9 @@
    - 화면 우하단 배지로 로드 건수 표시(3초)
    ====================================================================== */
 
+// 절대 경로(프로젝트 페이지 기준) — 먼저 시도
+const CASES_URL_ABSOLUTE = "https://dao-codes.github.io/Impact/cases.json";
+
 /* ---------------- 표준 응답 템플릿 ---------------- */
 const RESPONSES = {
   "운영시간/공간": `[사과] 이용 시간으로 불편을 드려 죄송합니다.
@@ -224,13 +227,14 @@ async function loadCases(){
   const abs   = `https://${owner}.github.io/${repo}/cases.json`;
 
   const basePath = location.pathname.replace(/[^/]+$/, ''); // 현재 폴더
-  const candidates = [
-    abs,                    // 절대 경로(깃허브 페이지 루트)
-    './cases.json',         // 동폴더
-    'cases.json',           // 동폴더(대체)
-    `${basePath}cases.json`,
-    `${location.origin}${basePath}cases.json`
-  ].filter((v,i,arr)=>arr.indexOf(v)===i);
+const candidates = [
+  CASES_URL_ABSOLUTE,      // ← 1순위: 절대경로
+  abs,                     // 기존 자동 추정 절대경로
+  './cases.json',
+  'cases.json',
+  `${basePath}cases.json`,
+  `${location.origin}${basePath}cases.json`
+].filter((v,i,arr)=>arr.indexOf(v)===i);
 
   for(const u of candidates){
     const data = await tryFetch(u);
