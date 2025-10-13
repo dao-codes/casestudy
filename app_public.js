@@ -1,12 +1,9 @@
 /* =========================================================================
-   app_public.js — Public build (dao-codes/Impact)
-   - 1순위: ./cases.json에서 사례를 로드 (존재하면 반드시 사용)
-   - 2순위: 아래 CASES_FALLBACK 사용
-   - GitHub Issues 연동 + 검색/칩/페이지네이션
-   - 실행 진단(콘솔/화면 배지) 추가: 로드된 건수 표시
+   app_public.js — Robust JSON loader (dao-codes/Impact)
+   - cases.json 경로 자동탐색: 절대경로 → 상대경로 여러 후보 → 실패 시 안내
+   - 검색/칩/페이지네이션 & GitHub Issues 연동 유지
    ====================================================================== */
 
-/* -------------------- 표준 응답 템플릿 -------------------- */
 const RESPONSES = {
   "운영시간/공간": `[사과] 이용 시간으로 불편을 드려 죄송합니다.
 [근거] 예산·인력·안전 지침에 따라 현 시간대를 운영 중입니다.
@@ -41,37 +38,7 @@ const RESPONSES = {
   "기타": `[사과] 관련 기준과 사실관계를 확인해 가장 빠른 방법으로 조치하고 결과를 안내드리겠습니다.`
 };
 
-/* -------------------- 사례(백업용 내장 목록; 일부 발췌) --------------------
-   - 실제 운영은 ./cases.json(114건)에서 불러옵니다.
-   - 아래는 페이지가 cases.json을 못 읽을 때만 사용됩니다.
-------------------------------------------------------------------------- */
-const CASES_FALLBACK = [
-  // === 운영시간/공간 (예시 일부) ===
-  {q:"프로그램은 왜 주말에 안하나요?",cat:"운영시간/공간"},
-  {q:"다른 센터는 저녁에도 대관이 가능한데 왜 안되나요?",cat:"운영시간/공간"},
-  {q:"프로그램이 주말에 없어서 들을 수 없어요",cat:"운영시간/공간"},
-  {q:"점심시간에도 상담이 가능했으면 합니다",cat:"운영시간/공간"},
-  {q:"공휴일에 문을 열 수 없나요?",cat:"운영시간/공간"},
-  {q:"스터디룸은 왜 평일 9~18시까지만 운영하나요?",cat:"운영시간/공간"},
-  {q:"공간이 작아 이용이 어려워요",cat:"운영시간/공간"},
-  {q:"성수역에서 오기 힘든 위치예요",cat:"운영시간/공간"},
-  {q:"혼잡 시간대가 너무 붐빕니다",cat:"운영시간/공간"},
-  {q:"대관 안내가 부족합니다",cat:"운영시간/공간"},
-  // === 선발/절차 ===
-  {q:"왜 프로그램 선발이 되지 않았나요?",cat:"선발/절차"},
-  {q:"프로그램 신청했는데 왜 탈락했죠? 매달 지원했는데도요?",cat:"선발/절차"},
-  {q:"합격 기준이 모호해요",cat:"선발/절차"},
-  {q:"선발 결과를 빨리 알고 싶어요",cat:"선발/절차"},
-  {q:"가점 기준을 공개해 주세요",cat:"선발/절차"},
-  {q:"선발 과정을 공개하지 않으면 민원을 넣겠습니다",cat:"선발/절차"},
-  {q:"전 기수 참여자는 지원하면 안 되는 거 아닌가요?",cat:"선발/절차"},
-  {q:"지인 추천 있나요? 불공정한 것 같아요",cat:"선발/절차"},
-  {q:"특정 학교만 유리한가요?",cat:"선발/절차"},
-  {q:"추첨 방식이 공정한가요?",cat:"선발/절차"},
-  // … (중략) 실제 114건은 cases.json에서 읽습니다.
-];
-
-/* -------------------- 요소/상태 -------------------- */
+/* ---------------- 요소/상태 ---------------- */
 const CATS = ["운영시간/공간","선발/절차","개인정보/마케팅","프로그램 품질","공정성/청렴성","상담","연락/소통","자료/콘텐츠","공간/환경","일정/기한","기관 신뢰성","참여 자격","리워드/경품","보안/시스템","기타"];
 const els = {
   search: document.getElementById('search'),
@@ -89,16 +56,15 @@ const els = {
 let page = 1;
 let pageSize = Number(els.pageSize?.value)||50;
 let activeCats = new Set();
-let view = []; // 로드 후 구성
+let view = [];
 
-/* -------------------- GitHub Issues 연동 -------------------- */
+/* ---------------- GitHub Issues ---------------- */
 const GH_OWNER = document.querySelector('meta[name="gh-owner"]')?.getAttribute('content')?.trim() || '';
 const GH_REPO  = document.querySelector('meta[name="gh-repo"]')?.getAttribute('content')?.trim() || '';
 const GH_LABEL = encodeURIComponent(document.querySelector('meta[name="gh-label"]')?.getAttribute('content')?.trim() || 'feedback');
 function ghNewIssueURL(row){
   const title = encodeURIComponent(`[${row.cat}] 문의/피드백: ${row.q}`.slice(0,250));
-  const body = encodeURIComponent(
-`다음 항목에 대한 의견/보완 제안을 남겨주세요.
+  const body = encodeURIComponent(`다음 항목에 대한 의견/보완 제안을 남겨주세요.
 
 - 카테고리: ${row.cat}
 - 질문: ${row.q}
@@ -116,7 +82,7 @@ function ghIssuesListURL(){
   return `https://github.com/${GH_OWNER}/${GH_REPO}/issues?q=is%3Aissue+label%3A${GH_LABEL}`;
 }
 
-/* -------------------- 공통 유틸 -------------------- */
+/* ---------------- 유틸 ---------------- */
 function escapeHTML(s){ return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 function parseSearch(q){
   q = (q||'').trim();
@@ -157,7 +123,7 @@ function filteredRows(){
   return {rows,terms};
 }
 
-/* -------------------- 렌더/UI -------------------- */
+/* ---------------- 렌더 ---------------- */
 function renderChips(){
   if(!els.chips) return;
   els.chips.innerHTML = `<button class="chip" id="chipReset" type="button">필터 해제</button>` +
@@ -178,13 +144,16 @@ function syncChips(){
 function rowHtml(r, terms){
   const qHtml = highlight(escapeHTML(r.q), terms);
   const aHtml = highlight(escapeHTML(r.a||'').replace(/\n/g,'<br>'), terms);
-  const issueBtn = `<button class="btn primary open-issue" data-idx="${r.idx}" type="button">의견 남기기</button>`;
-  const listBtn  = `<a class="btn outlined" href="${ghIssuesListURL()}" target="_blank" rel="noopener">피드백 보기</a>`;
   return `<tr>
     <td data-h="#">${r.idx}</td>
     <td data-h="민원 사례"><span class="q">${qHtml}</span> <span class="cat">${r.cat}</span></td>
     <td data-h="가이드"><div class="resp">${aHtml}</div></td>
-    <td data-h="의견"><div class="row-actions">${issueBtn}${listBtn}</div></td>
+    <td data-h="의견">
+      <div class="row-actions">
+        <button class="btn primary open-issue" data-idx="${r.idx}" type="button">의견 남기기</button>
+        <a class="btn outlined" href="${ghIssuesListURL()}" target="_blank" rel="noopener">피드백 보기</a>
+      </div>
+    </td>
   </tr>`;
 }
 function bindRowEvents(){
@@ -220,67 +189,74 @@ function render(){
   bindRowEvents();
 }
 
-/* -------------------- 진단 배지 -------------------- */
-function showBadge(text, ok=true){
+/* ---------------- 진단 배지 ---------------- */
+function badge(text, ok=true){
   const el = document.createElement('div');
   el.textContent = text;
-  el.style.cssText = `
-    position:fixed;right:10px;bottom:10px;z-index:9999;
-    background:${ok?'#0B57D0':'#B3261E'};color:#fff;padding:6px 10px;
-    border-radius:12px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)`;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), 3000);
+  el.style.cssText = `position:fixed;right:10px;bottom:10px;z-index:9999;
+    background:${ok?'#0B57D0':'#B3261E'};color:#fff;padding:6px 10px;border-radius:12px;
+    font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.2)`;
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 3000);
 }
 
-/* -------------------- 데이터 로드(핵심) -------------------- */
-async function loadCases(){
+/* ---------------- cases.json 경로 자동 탐색 ---------------- */
+async function tryFetch(url){
   try{
-    // 1) ./cases.json 있으면 그걸 사용(권장)
-    const res = await fetch('./cases.json', {cache:'no-store'});
-    if(res.ok){
-      const arr = await res.json();
-      if(Array.isArray(arr) && arr.length){
-        console.info('[Impact] cases.json loaded:', arr.length);
-        return arr;
-      }
-    }
+    const r = await fetch(url, {cache:'no-store'});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    if(Array.isArray(data) && data.length) return data;
+    throw new Error('empty array');
   }catch(e){
-    console.warn('[Impact] cases.json fetch failed:', e);
+    console.warn('[Impact] fetch failed:', url, e);
+    return null;
   }
-  // 2) 없으면 내장 목록 사용
-  console.info('[Impact] using fallback CASES:', CASES_FALLBACK.length);
-  return CASES_FALLBACK;
 }
 
-/* -------------------- 이벤트 바인딩 -------------------- */
+async function loadCases(){
+  const owner = GH_OWNER || location.hostname.split('.')[0]; // dao-codes
+  const repo  = GH_REPO  || location.pathname.split('/')[1]; // Impact
+  const abs   = `https://${owner}.github.io/${repo}/cases.json`;
+
+  // 여러 후보 경로를 순차 시도
+  const basePath = location.pathname.replace(/[^/]+$/, ''); // 현재 폴더 (/Impact/ 혹은 /Impact/sub/)
+  const candidates = [
+    abs,
+    './cases.json',
+    'cases.json',
+    `${basePath}cases.json`,
+    `${location.origin}${basePath}cases.json`
+  ].filter((v,i,arr)=>arr.indexOf(v)===i); // 중복 제거
+
+  for(const u of candidates){
+    const data = await tryFetch(u);
+    if(data){ console.info('[Impact] cases loaded from:', u, 'count=', data.length); badge(`로딩: ${data.length}건`, true); return data; }
+  }
+  // 전부 실패: 안내
+  badge('cases.json 로드 실패(오류는 콘솔 확인)', false);
+  alert('cases.json을 찾지 못했습니다. index.html과 같은 폴더에 두셨는지 확인해 주세요.');
+  return [];
+}
+
+/* ---------------- 이벤트 ---------------- */
 els.search?.addEventListener('input', ()=>{ page=1; render(); });
 els.prev?.addEventListener('click', ()=>{ if(page>1){ page--; render(); } });
 els.next?.addEventListener('click', ()=>{ page++; render(); });
 els.pageSize?.addEventListener('change', ()=>{ pageSize = Number(els.pageSize.value)||50; page=1; render(); });
-
 els.toggleTheme?.addEventListener('click', ()=>{
   const root = document.documentElement;
   const mode = root.getAttribute('data-theme');
   root.setAttribute('data-theme', mode==='dark' ? 'auto' : 'dark');
 });
-
 els.openIssues?.addEventListener('click', ()=>{
-  if(!GH_OWNER || !GH_REPO){
-    alert('깃허브 저장소 메타(meta[gh-owner], meta[gh-repo])를 설정해 주세요.');
-    return;
-  }
+  if(!GH_OWNER || !GH_REPO){ alert('깃허브 저장소 메타(meta[gh-owner], meta[gh-repo])를 설정해 주세요.'); return; }
   window.open(ghIssuesListURL(), '_blank', 'noopener');
 });
 
-/* -------------------- 시작 -------------------- */
+/* ---------------- 시작 ---------------- */
 renderChips();
 loadCases().then(cases=>{
-  // 데이터 반영
   view = cases.map((d,i)=>({idx:i+1, q:d.q, cat:d.cat, a:RESPONSES[d.cat]||RESPONSES["기타"]}));
-  // 진단 출력
-  console.log('[Impact] Loaded cases:', view.length);
-  showBadge(`로드된 사례: ${view.length}건`, view.length>=50);
-  // 렌더
   page = 1;
   render();
 });
