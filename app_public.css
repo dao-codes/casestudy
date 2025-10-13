@@ -164,3 +164,47 @@ td .row-actions{ display:flex; flex-direction:column; gap:6px; }
 @media(max-width:640px){
   :root{ --sticky-filters:118px; }
   .row-actions{
+
+/* ✅ 모바일 테이블 깨짐 복구 */
+@media (max-width: 640px) {
+
+  /* 테이블을 가로 스크롤 가능하게 */
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* 부드러운 스크롤 */
+    border-spacing: 0;
+    white-space: nowrap; /* 텍스트 vertical 깨짐 방지 */
+  }
+
+  thead, tbody, tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  /* 각 열 비율 재설정 */
+  td[data-h="#"] { width: 40px; }
+  tbody td:nth-child(2) { width: 55%; } /* 민원 사례 넓게 */
+  tbody td:nth-child(3) { width: 30%; } /* 가이드 */
+  tbody td:nth-child(4) { width: 160px; text-align: center; } /* 버튼 영역 */
+
+  /* 텍스트 깨짐 방지 */
+  .q, .resp {
+    white-space: normal !important;
+    word-break: keep-all;
+  }
+
+  /* 버튼 2줄 세로 UI 유지 */
+  td .row-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* sticky header 보정 */
+  thead th {
+    top: var(--sticky-offset);
+  }
+}
