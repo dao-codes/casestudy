@@ -1,9 +1,11 @@
 /* =========================================================================
    app_public.js — Robust JSON loader (dao-codes/Impact)
-   - cases.json 경로 자동탐색: 절대경로 → 상대경로 여러 후보 → 실패 시 안내
-   - 검색/칩/페이지네이션 & GitHub Issues 연동 유지
+   - cases.json 경로 자동탐색: 절대경로 → 상대경로 후보 → 실패 시 알림
+   - 검색/칩/페이지네이션 & GitHub Issues 연동
+   - 화면 우하단 배지로 로드 건수 표시(3초)
    ====================================================================== */
 
+/* ---------------- 표준 응답 템플릿 ---------------- */
 const RESPONSES = {
   "운영시간/공간": `[사과] 이용 시간으로 불편을 드려 죄송합니다.
 [근거] 예산·인력·안전 지침에 따라 현 시간대를 운영 중입니다.
@@ -40,6 +42,7 @@ const RESPONSES = {
 
 /* ---------------- 요소/상태 ---------------- */
 const CATS = ["운영시간/공간","선발/절차","개인정보/마케팅","프로그램 품질","공정성/청렴성","상담","연락/소통","자료/콘텐츠","공간/환경","일정/기한","기관 신뢰성","참여 자격","리워드/경품","보안/시스템","기타"];
+
 const els = {
   search: document.getElementById('search'),
   chips: document.getElementById('chips'),
@@ -53,6 +56,7 @@ const els = {
   toggleTheme: document.getElementById('toggleTheme'),
   openIssues: document.getElementById('openIssues'),
 };
+
 let page = 1;
 let pageSize = Number(els.pageSize?.value)||50;
 let activeCats = new Set();
@@ -62,6 +66,10 @@ let view = [];
 const GH_OWNER = document.querySelector('meta[name="gh-owner"]')?.getAttribute('content')?.trim() || '';
 const GH_REPO  = document.querySelector('meta[name="gh-repo"]')?.getAttribute('content')?.trim() || '';
 const GH_LABEL = encodeURIComponent(document.querySelector('meta[name="gh-label"]')?.getAttribute('content')?.trim() || 'feedback');
+
+function ghIssuesListURL(){
+  return `https://github.com/${GH_OWNER}/${GH_REPO}/issues?q=is%3Aissue+label%3A${GH_LABEL}`;
+}
 function ghNewIssueURL(row){
   const title = encodeURIComponent(`[${row.cat}] 문의/피드백: ${row.q}`.slice(0,250));
   const body = encodeURIComponent(`다음 항목에 대한 의견/보완 제안을 남겨주세요.
@@ -77,9 +85,6 @@ ${row.a}
 시간: ${new Date().toLocaleString('ko-KR', {hour12:false})}`);
   const base = `https://github.com/${GH_OWNER}/${GH_REPO}/issues/new`;
   return `${base}?title=${title}&body=${body}&labels=${GH_LABEL}`;
-}
-function ghIssuesListURL(){
-  return `https://github.com/${GH_OWNER}/${GH_REPO}/issues?q=is%3Aissue+label%3A${GH_LABEL}`;
 }
 
 /* ---------------- 유틸 ---------------- */
@@ -199,7 +204,7 @@ function badge(text, ok=true){
   document.body.appendChild(el); setTimeout(()=>el.remove(), 3000);
 }
 
-/* ---------------- cases.json 경로 자동 탐색 ---------------- */
+/* ---------------- cases.json 로더(경로 자동 탐색) ---------------- */
 async function tryFetch(url){
   try{
     const r = await fetch(url, {cache:'no-store'});
@@ -215,25 +220,27 @@ async function tryFetch(url){
 
 async function loadCases(){
   const owner = GH_OWNER || location.hostname.split('.')[0]; // dao-codes
-  const repo  = GH_REPO  || location.pathname.split('/')[1]; // Impact
+  const repo  = GH_REPO  || location.pathname.split('/').filter(Boolean)[0] || 'Impact';
   const abs   = `https://${owner}.github.io/${repo}/cases.json`;
 
-  // 여러 후보 경로를 순차 시도
-  const basePath = location.pathname.replace(/[^/]+$/, ''); // 현재 폴더 (/Impact/ 혹은 /Impact/sub/)
+  const basePath = location.pathname.replace(/[^/]+$/, ''); // 현재 폴더
   const candidates = [
-    abs,
-    './cases.json',
-    'cases.json',
+    abs,                    // 절대 경로(깃허브 페이지 루트)
+    './cases.json',         // 동폴더
+    'cases.json',           // 동폴더(대체)
     `${basePath}cases.json`,
     `${location.origin}${basePath}cases.json`
-  ].filter((v,i,arr)=>arr.indexOf(v)===i); // 중복 제거
+  ].filter((v,i,arr)=>arr.indexOf(v)===i);
 
   for(const u of candidates){
     const data = await tryFetch(u);
-    if(data){ console.info('[Impact] cases loaded from:', u, 'count=', data.length); badge(`로딩: ${data.length}건`, true); return data; }
+    if(data){
+      console.info('[Impact] cases loaded from:', u, 'count=', data.length);
+      badge(`로딩: ${data.length}건`, true);
+      return data;
+    }
   }
-  // 전부 실패: 안내
-  badge('cases.json 로드 실패(오류는 콘솔 확인)', false);
+  badge('cases.json 로드 실패(콘솔 확인)', false);
   alert('cases.json을 찾지 못했습니다. index.html과 같은 폴더에 두셨는지 확인해 주세요.');
   return [];
 }
