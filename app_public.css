@@ -321,3 +321,48 @@ mark{
   body { background: #fff; }
   table { box-shadow: none; border-color: #ddd; }
 }
+
+/* === Fix: 페이지네이션 버튼이 세로로 쌓이는 문제 === */
+
+/* 1) 표 내부(의견 칸)에서만 .row-actions 그리드 적용 */
+td .row-actions{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+/* 2) 푸터의 컨트롤 영역을 가로 정렬 */
+.footer > div:last-child{
+  display: inline-flex;       /* 가로로 배치 */
+  align-items: center;
+  gap: 8px;
+}
+
+/* 3) 페이지 정보와 셀렉트 모양 보정 */
+#pageInfo{
+  min-width: 36px;
+  text-align: center;
+  color: var(--muted);
+}
+#pageSize{
+  height: 36px;
+  line-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 8px;
+  background: transparent;
+  color: var(--text);
+}
+
+/* 4) 모바일에서도 가로 정렬 유지 */
+@media (max-width: 640px){
+  .footer{
+    flex-wrap: wrap;
+  }
+  .footer > div:last-child{
+    display: flex;
+    flex-wrap: nowrap;        /* 버튼 줄바꿈 방지 */
+    gap: 8px;
+  }
+}
+
