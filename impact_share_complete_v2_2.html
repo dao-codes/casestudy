@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="auto">
+<head>
+<meta charset="utf-8" />
+<meta name="app-id" content="impact-share-center-v1">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>청년센터 컴플레인 사례집 v3.5 – Material Design 적용</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1&display=swap" rel="stylesheet">
+<style>
+  /* ================= Material Design Tokens (MD3) ================= */
+  :root{
+    /* Core tokens */
+    --md-sys-color-primary:#0B57D0;
+    --md-sys-color-on-primary:#FFFFFF;
+    --md-sys-color-secondary:#6C92F4;
+    --md-sys-color-surface:#FAFAFA;
+    --md-sys-color-surface-variant:#F0F3FF;
+    --md-sys-color-on-surface:#0F172A;
+    --md-sys-color-outline:#E2E8F0;
+    --md-sys-color-error:#E11D48;
+    --md-sys-color-on-error:#FFFFFF;
+    --md-sys-color-success:#16A34A;
+    --md-sys-color-warning:#D97706;
+    --md-ease-in:cubic-bezier(.2,0,0,1);
+    --md-ease-out:cubic-bezier(.4,0,.2,1);
+
+    /* App mapping */
+    --brand:var(--md-sys-color-primary);
+    --brand-2:var(--md-sys-color-secondary);
+    --bg:linear-gradient(120deg,#eef4ff 0%,#f8fafc 40%,#f6fff7 100%); /* soft gradient */
+    --paper:var(--md-sys-color-surface);
+    --paper-glass:color-mix(in oklab, #ffffff 68%, transparent);
+    --text:var(--md-sys-color-on-surface);
+    --muted:#6b7280;
+    --line:var(--md-sys-color-outline);
+    --shadow-1:0 1px 2px rgba(0,0,0,.08);
+    --shadow-3:0 8px 24px rgba(0,0,0,.18);
+    --focus:#34D399;
+    --chip:#e8f0ff; --chip-text:#1e3a8a; --sel:#eef6ff;
+    --danger:var(--md-sys-color-error); --danger-ink:#fff;
+    --ok:var(--md-sys-color-success); --warn:var(--md-sys-color-warning); --info:#0ea5e9;
+    --radius-1:12px; --radius-2:16px; --radius-3:20px;
+  }
+  :root[data-theme="dark"]{
+    --md-sys-color-primary:#6CA8FF;
+    --md-sys-color-secondary:#9BC0FF;
+    --md-sys-color-surface:#0F172A;
+    --md-sys-color-surface-variant:#0b3b77;
+    --md-sys-color-on-surface:#E5E7EB;
+    --md-sys-color-outline:#1F2937;
+
+    --brand:var(--md-sys-color-primary);
+    --bg:linear-gradient(120deg,#0a1223 0%,#0f172a 40%,#061a12 100%);
+    --paper:#0f172a;
+    --paper-glass:color-mix(in oklab, #1b2538 74%, transparent);
+    --text:var(--md-sys-color-on-surface);
+    --muted:#9CA3AF; --line:#1f2937;
+    --chip:#14386e; --chip-text:#dbeafe; --sel:#0e2a55;
+  }
+  @media (prefers-color-scheme: dark){
+    :root[data-theme="auto"]{
+      --md-sys-color-primary:#6CA8FF; --md-sys-color-secondary:#9BC0FF;
+      --md-sys-color-surface:#0F172A; --md-sys-color-on-surface:#E5E7EB;
+      --md-sys-color-outline:#1F2937; --bg:linear-gradient(120deg,#0a1223 0%,#0f172a 40%,#061a12 100%);
+      --paper:#0f172a; --paper-glass:color-mix(in oklab, #1b2538 74%, transparent); --text:#E5E7EB;
+      --muted:#9CA3AF; --line:#1f2937; --chip:#14386e; --chip-text:#dbeafe; --sel:#0e2a55;
+    }
+  }
+
+  /* ================= Base ================= */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:"맑은 고딕",system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+    margin:0;color:var(--text);background:var(--bg);
+  }
+  .material{font-family:"Material Symbols Rounded";font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+  header{display:flex;gap:14px;align-items:center;padding:20px 20px 8px;max-width:1200px;margin:0 auto}
+  .brand-logo{width:44px;height:44px;object-fit:contain;border-radius:10px;border:1px solid var(--line);background:#fff}
+  .title-block{display:flex;flex-direction:column;gap:6px}
+  .title{margin:0;color:var(--brand);font-size:24px;line-height:1.2}
+  .subtitle{color:var(--muted);font-size:12px}
+  .wrap{max-width:1200px;margin:12px auto 120px;background:var(--paper-glass);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-1);backdrop-filter:blur(8px);overflow:hidden}
+
+  /* ================= Controls (Prefs) ================= */
+  .prefs{display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--paper)}
+  .prefs .left{display:flex;gap:8px;align-items:center}
+  .prefs input[type="text"]{border:1px solid var(--line);border-radius:16px;padding:10px 12px;min-width:220px;background:transparent;color:var(--text)}
+  .prefs input[type="color"]{width:36px;height:36px;border:none;background:transparent;cursor:pointer}
+  .seg{display:flex;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .seg button{padding:8px 12px;border:none;background:transparent;color:var(--text);cursor:pointer}
+  .seg button.active{background:var(--brand);color:#fff}
+  .btn{border:1px solid var(--line);background:var(--brand);color:var(--md-sys-color-on-primary);border-radius:16px;padding:10px 14px;cursor:pointer;box-shadow:var(--shadow-1);transition:box-shadow .2s var(--md-ease-in),transform .2s,var(--md-ease-in)}
+  .btn:hover{box-shadow:0 6px 18px rgba(0,0,0,.14);transform:translateY(-1px)}
+  .btn.ghost{background:color-mix(in oklab, var(--brand) 10%, transparent);color:var(--brand)}
+  .btn.danger{background:var(--danger);color:var(--danger-ink);border-color:transparent}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .help{font-size:12px;color:var(--muted)}
+
+  details.helpbox{grid-column:1/-1;border:1px dashed var(--line);border-radius:16px;padding:8px 12px;background:var(--paper)}
+  details.helpbox summary{cursor:pointer;color:var(--brand);margin:-4px 0 6px}
+
+  /* ================= Filters ================= */
+  .filtersWrap{border-bottom:1px solid var(--line);background:var(--paper)}
+  .filtersHead{display:flex;justify-content:space-between;align-items:center;padding:10px 16px}
+  .filters{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
+  .chip{padding:6px 12px;border-radius:999px;background:color-mix(in oklab, var(--brand) 10%, var(--paper));color:var(--text);cursor:pointer;border:1px solid var(--line);font-size:12px;transition:background .2s var(--md-ease-in)}
+  .chip.active{background:var(--brand);color:#fff;border-color:transparent}
+  .activeFilters{padding:0 16px 10px;color:var(--muted);font-size:13px}
+  .activeFilters .tag{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:4px 10px;margin-right:6px}
+
+  /* ================= Toolbar ================= */
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:6}
+  .toolbar input[type="search"]{flex:1 1 300px;min-width:220px;border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:transparent;color:var(--text)}
+  .toolbar .sep{width:1px;height:32px;background:var(--line);margin:0 6px}
+  .count{margin-left:auto;color:var(--muted);display:flex;gap:10px}
+  .count b{color:var(--brand)}
+  .export{position:relative}
+  .menu{position:absolute;right:0;top:42px;background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-3);border-radius:16px;overflow:hidden;display:none;z-index:10;min-width:200px;transform:scale(.98);opacity:0;transform-origin:100% 0;transition:transform .2s var(--md-ease-in),opacity .2s}
+  .menu[aria-hidden="false"]{display:block;transform:scale(1);opacity:1}
+  .menu button{width:100%;display:block;text-align:left;border:none;background:transparent;padding:10px 12px;cursor:pointer}
+  .menu button:hover{background:rgba(0,0,0,.06)}
+  .rightTools{display:flex;gap:6px;align-items:center;margin-left:auto}
+  .icon{font-family:"Material Symbols Rounded";font-size:20px;vertical-align:-4px}
+
+  /* ================= Notification bell ================= */
+  .notif{margin-left:8px;position:relative}
+  .notif .badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--danger);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
+
+  /* ================= Table ================= */
+  .table{width:100%;border-collapse:collapse}
+  .table th,.table td{border-top:1px solid var(--line);padding:12px 12px;vertical-align:top;line-height:1.55;word-break:keep-all}
+  .table thead th{background:var(--brand);color:#fff;position:sticky;top:62px;z-index:5}
+  .checkbox{display:flex;justify-content:center;align-items:center}
+  .checkbox input{width:24px;height:24px}
+  tbody tr:nth-child(even){background:rgba(0,0,0,.03)}
+  tr.selected{background:var(--sel)}
+  .resp[contenteditable="true"]{outline:none;border:1px dashed transparent;border-radius:12px;padding:4px}
+  .resp[contenteditable="true"]:focus{border-color:var(--brand);background:rgba(0,0,0,.03)}
+  mark{background:#fff3b0;padding:0 .12em;border-radius:.2em}
+
+  /* 상태 뱃지 */
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;border:1px solid var(--line)}
+  .badge.wait{background:color-mix(in oklab, var(--brand) 6%, var(--paper));color:var(--text)}
+  .badge.doing{background:color-mix(in oklab, var(--warn) 14%, var(--paper));color:#4a2c00}
+  .badge.done{background:color-mix(in oklab, var(--ok) 16%, var(--paper));color:#064f22}
+
+  /* ================= Dashboard Cards ================= */
+  .dash{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;padding:12px 16px;border-top:1px solid var(--line);background:var(--paper)}
+  .card{border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow-1);background:var(--paper)}
+  .kpi{display:flex;align-items:center;gap:12px}
+  .kpi .num{font-size:22px;font-weight:700}
+  .bar{height:10px;border-radius:6px;background:rgba(0,0,0,.08);overflow:hidden}
+  .bar>i{display:block;height:100%;background:var(--brand);transition:width .4s var(--md-ease-out)}
+
+  /* ================= Pager & Footer ================= */
+  .footer{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;color:var(--muted);background:var(--paper)}
+  .pager{display:flex;gap:8px;align-items:center}
+  .pager .btn{background:var(--paper);color:var(--text)}
+  .page-size{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:transparent;color:var(--text)}
+
+  /* ================= Mobile ================= */
+  @media (max-width: 860px){
+    .prefs{grid-template-columns:1fr 1fr;row-gap:8px}
+    .toolbar{gap:6px}
+    table,.table thead,.table tbody,.table th,.table td,.table tr{display:block}
+    .table thead{display:none}
+    .table tr{border-top:1px solid var(--line);padding:10px 12px}
+    .table td{border:none;padding:6px 0}
+    .table td[data-l="번호"]::before,
+    .table td[data-l="민원 사례"]::before,
+    .table td[data-l="상태"]::before,
+    .table td[data-l="응답"]::before{content:attr(data-l);display:block;font-weight:700;margin-bottom:4px}
+    .checkbox{justify-content:flex-start}
+  }
+  /* Mobile FAB */
+  .fab{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:9}
+  .fab .btn{border-radius:28px}
+
+  /* ================= Print ================= */
+  @media print{
+    body{background:#fff}
+    header,.prefs,.filtersWrap,.toolbar,.footer,.dash{display:none!important}
+    .wrap{border:none;box-shadow:none}
+    table{page-break-inside:auto;width:100%}
+    thead{display:table-header-group}
+    tr{page-break-inside:avoid;break-inside:avoid}
+    td,th{font-size:12pt;color:#000}
+    /* 페이지 번호 */
+    body::after{content:counter(page) " / " counter(pages);position:fixed;bottom:8mm;left:0;right:0;text-align:center;font-size:10px;color:#555}
+  }
+
+  /* ================= Focus & Toast ================= */
+  :where(button,input,select,summary):focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:14px}
+  .toast{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:9999}
+  .toast .msg{background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-3);padding:10px 12px;border-radius:14px;color:var(--text);min-width:240px}
+
+  /* ================= Skeleton ================= */
+  .skeleton{animation:shine 1.2s linear infinite;background:linear-gradient(90deg,rgba(0,0,0,.06) 25%,rgba(0,0,0,.12) 37%,rgba(0,0,0,.06) 63%);background-size:400% 100%;border-radius:10px}
+  @keyframes shine{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* FAB: Add Case */
+.fab-add{position:fixed;right:18px;bottom:86px;z-index:10000}
+.fab-add button{width:56px;height:56px;border-radius:50%;border:none;background: var(--brand,#6750A4);color:#fff;box-shadow: var(--shadow-3);cursor:pointer}
+.fab-add button .icon{font-size:28px;vertical-align:-6px}
+@media (max-width:720px){ .fab-add{right:14px;bottom:82px} }
+
+
+/* Modal: Add Case */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:11000}
+.modal[aria-hidden="false"]{display:flex}
+.modal-card{width:min(720px,92vw);background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow: var(--shadow-3);display:flex;flex-direction:column;max-height:85vh}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+.modal-body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;padding:12px 14px;border-top:1px solid var(--line)}
+.modal .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal textarea,.modal input,.modal select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--text)}
+@media (max-width:720px){ .modal .grid{grid-template-columns:1fr} }
+
+
+/* Material Export */
+:root{ --md-primary:#6750A4; --md-outline:var(--line); --md-surface:var(--paper); --md-on-surface:var(--text) }
+.export #exportBtn{
+  appearance:none;border:none;border-radius:9999px;padding:10px 16px;
+  background: color-mix(in oklab, var(--md-primary) 92%, white 8%);
+  color:#fff;font-weight:600;letter-spacing:.2px;position:relative;overflow:hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.12);
+}
+.export #exportBtn .icon{margin-right:6px;font-size:16px}
+.export #exportBtn:focus-visible{outline:2px solid color-mix(in oklab, var(--md-primary) 40%, white 60%);outline-offset:2px}
+.export #exportBtn:active{transform:translateY(1px)}
+.export #exportBtn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.22);opacity:0;transition:opacity .2s}
+.export #exportBtn:hover::after{opacity:.08}
+.menu{border-radius:14px;border:1px solid var(--md-outline);background: var(--md-surface);color: var(--md-on-surface);box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.menu button{border-radius:10px}
+.menu button:hover{background: color-mix(in oklab, var(--md-surface) 80%, black 20%);color: var(--md-on-surface)}
+.menu[aria-hidden="true"]{display:none;opacity:0;transform:scale(.98);pointer-events:none}
+
+
+/* ==== Dark mode contrast for Export menu ==== */
+[data-theme="dark"] .menu{ 
+  background: #111827; /* slate-900 */
+  color: #e5e7eb;      /* gray-200 */
+  border-color: #374151; /* slate-700 */
+}
+[data-theme="dark"] .menu button{ color: #e5e7eb; }
+[data-theme="dark"] .menu button:hover{
+  background: #1f2937; /* slate-800 */
+  color: #f3f4f6;      /* gray-100 */
+}
+
+
+/* ==== Dark mode export menu: always-visible text (no hover dependency) ==== */
+[data-theme="dark"] .menu{
+  background:#111827;           /* slate-900 */
+  color:#e5e7eb;                /* gray-200 */
+  border-color:#374151;         /* slate-700 */
+}
+[data-theme="dark"] .menu button{
+  color:#f9fafb !important;     /* gray-50 for maximum contrast */
+  background:transparent; 
+  opacity:1;                    /* ensure text is not dimmed */
+}
+[data-theme="dark"] .menu button:hover{
+  background:#1f2937;           /* slate-800 */
+  color:#ffffff !important;
+}
+[data-theme="dark"] .menu .sep{
+  background:#374151;
+}
+
+
+/* ==== Export menu: always-visible text on open (light & dark) ==== */
+.menu{ color: var(--text) !important; }
+.menu button{ color: var(--text) !important; opacity: 1 !important; }
+.menu button:hover{ color: inherit !important; } /* keep text color, only bg changes */
+/* Ensure visible state is fully opaque */
+.menu[aria-hidden="false"]{ display:block; opacity:1; transform:scale(1); }
+/* Dark mode keeps its brighter text but also forces full opacity */
+[data-theme="dark"] .menu button{ color:#f9fafb !important; opacity:1 !important; }
+
+</style>
+</head>
+<body>
+  <!-- ================= Header ================= -->
+  <header>
+    <img id="logo" class="brand-logo" src="" alt="기관 로고" onerror="this.style.display='none'">
+    <div class="title-block">
+      <h1 class="title" id="orgTitle">청년센터 컴플레인 사례집 <small style="font-size:.8em;color:var(--muted)">직원 매뉴얼</small></h1>
+      <div class="subtitle">검색/필터 · 템플릿 · 상태 뱃지 · 선택 내보내기 · 자동 저장 · 다크/라이트</div>
+    </div>
+  </header>
+
+  <div class="wrap" role="main">
+    <!-- ================= Prefs ================= -->
+    <div class="prefs" id="prefs">
+      <div class="left">
+        <label class="btn ghost" for="logoInp" aria-label="로고 업로드"><span class="icon">image</span>&nbsp;로고</label>
+        <input id="logoInp" type="file" accept="image/*" hidden>
+        <input id="orgInp" type="text" placeholder="기관명 또는 타이틀 입력" aria-label="기관명 입력">
+      </div>
+
+      <div class="toggle" aria-label="브랜드 컬러 선택">
+        <span class="help" style="margin-right:6px">메인</span>
+        <input type="color" id="brandMain" value="#0B57D0" title="브랜드 메인">
+        <span class="help" style="margin:0 6px 0 12px">보조</span>
+        <input type="color" id="brandSub" value="#6C92F4" title="브랜드 보조">
+      </div>
+
+      <div class="seg" role="group" aria-label="타이틀 정렬">
+        <button id="alignL" class="active" title="좌정렬">좌</button>
+        <button id="alignC" title="가운데 정렬">중</button>
+      </div>
+
+      <div class="seg" role="group" aria-label="테마">
+        <button id="themeLight">라이트</button>
+        <button id="themeDark">다크</button>
+        <button id="themeAuto" class="active">자동</button>
+      </div>
+
+      <!-- 관리자 모드 토글 -->
+      <div class="seg" role="group" aria-label="관리자 모드">
+        <button id="adminOff" class="active" title="일반 사용자">사용자</button>
+        <button id="adminOn" title="관리자 기능 보기">관리자</button>
+      </div>
+
+      <button id="savePrefs" class="btn" aria-label="설정 저장"><span class="icon">save</span>&nbsp;설정</button>
+
+      <details class="helpbox">
+        <summary>처음 사용하시나요? 30초 안내</summary>
+        <ol style="margin:6px 0 10px 18px;padding:0">
+          <li>🔍 검색·필터로 항목을 찾습니다. (고급: <code>카테고리:"상담" -키워드:"주말"</code>)</li>
+          <li>☑️ 체크박스로 선택 → <b>내보내기</b>에서 인쇄/PDF/CSV를 고릅니다.</li>
+          <li>✏️ <b>편집</b> 모드에서 문안을 수정하거나 템플릿을 삽입하세요.</li>
+        </ol>
+        <div class="help">※ 관리자 모드에서만 JSON 백업/복원이 노출됩니다.</div>
+      </details>
+    </div>
+
+    <!-- ================= Filters ================= -->
+    <div class="filtersWrap">
+      <div class="filtersHead">
+        <strong>카테고리</strong>
+        <button id="toggleFilters" class="btn ghost" aria-expanded="true"><span class="icon">unfold_less</span>&nbsp;접기</button>
+      </div>
+      <div class="filters" id="chips" role="region" aria-label="카테고리 필터"></div>
+      <div class="activeFilters" id="activeFilters"></div>
+    </div>
+
+    <!-- ================= Toolbar ================= -->
+    <div class="toolbar" role="toolbar" aria-label="도구 모음">
+      <span class="icon" aria-hidden="true">search</span>
+      <input id="q" list="qhist" type="search" placeholder='예: "주말", 카테고리:"상담" -키워드:"추첨"' aria-label="검색">
+      <datalist id="qhist"></datalist>
+
+      <button class="btn ghost" id="selAll" aria-label="표시된 항목 전체 선택"><span class="icon">done_all</span>&nbsp;전체</button>
+      <button class="btn ghost" id="selNone" aria-label="표시된 항목 선택 해제"><span class="icon">deselect</span>&nbsp;해제</button>
+      <button class="btn" id="restoreSel" title="선택 항목 초기 템플릿 복구" aria-label="선택 복구"><span class="icon">settings_backup_restore</span>&nbsp;선택 복구</button>
+
+      <span class="sep" aria-hidden="true"></span>
+
+      <!-- Export dropdown -->
+      
+<button id="addCase" class="btn" aria-label="새 사례 추가"><span class="icon">add</span>&nbsp;새 사례</button>
+<div class="export">
+        <button id="exportBtn" aria-haspopup="menu" aria-expanded="false"><span class="icon">ios_share</span>&nbsp;내보내기 ▾</button>
+        <div id="exportMenu" class="menu" role="menu" aria-hidden="true">
+          <button id="printSel" role="menuitem">🖨 인쇄(선택)</button>
+          <button id="pdfSel" role="menuitem">🗂 PDF 저장(선택)</button>
+          <button id="csvSel" role="menuitem">📊 CSV 저장(선택)</button>
+        </div>
+      </div>
+
+      <div class="sep" aria-hidden="true"></div>
+
+      <div class="rightTools">
+        <span class="help">모드:</span>
+        <div class="seg" role="group" aria-label="보기/편집">
+          <button id="modeView" class="active">보기</button>
+          <button id="modeEdit">편집</button>
+        </div>
+
+        <!-- 관리자 전용 -->
+        <div class="seg" id="adminData" role="group" aria-label="데이터(관리자)" style="display:none">
+          <button id="exportJson" class="btn ghost" title="JSON으로 내보내기">Export JSON</button>
+          <button id="importJson" class="btn ghost" title="JSON 불러오기">Import JSON</button>
+          <input id="jsonFile" type="file" accept="application/json" hidden>
+        </div>
+
+        <!-- 알림 벨 -->
+        <div class="notif" title="알림">
+          <button id="bell" class="btn ghost" aria-label="알림"><span class="icon">notifications</span></button>
+          <span id="bellBadge" class="badge" style="display:none">0</span>
+        </div>
+      </div>
+
+      <div class="count" id="count" aria-live="polite"></div>
+    </div>
+
+    <!-- ================= Table ================= -->
+    <table class="table" role="table" aria-label="컴플레인 사례 표">
+      <thead>
+        <tr>
+          <th style="width:72px">선택</th>
+          <th style="width:72px">번호</th>
+          <th>민원 사례</th>
+          <th style="width:140px">상태</th>
+          <th>응답(템플릿/편집)</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <!-- skeleton first paint -->
+        <tr><td colspan="5">
+          <div class="skeleton" style="height:14px;margin:8px 0"></div>
+          <div class="skeleton" style="height:14px;margin:8px 0;width:60%"></div>
+          <div class="skeleton" style="height:14px;margin:8px 0;width:40%"></div>
+        </td></tr>
+      </tbody>
+    </table>
+
+    <!-- ================= Dashboard (cards) ================= -->
+    <div class="dash" id="dash">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>📊 카테고리 분포</strong>
+          <span class="help">검색/필터 반영</span>
+        </div>
+        <div id="statsList" style="margin-top:8px;display:grid;gap:8px"></div>
+      </div>
+      <div class="card kpi">
+        <span class="icon">list_alt</span>
+        <div>
+          <div class="help">총 건수</div>
+          <div class="num" id="kpiTotal">0</div>
+        </div>
+      </div>
+      <div class="card kpi">
+        <span class="icon">task_alt</span>
+        <div>
+          <div class="help">선택 건수</div>
+          <div class="num" id="kpiSelected">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= Footer ================= -->
+    <div class="footer">
+      <div class="pager" aria-label="페이지네이션">
+        <button class="btn" id="prev"><span class="icon">chevron_left</span>&nbsp;이전</button>
+        <span class="help" id="pageInfo">1 / 1</span>
+        <button class="btn" id="next">다음&nbsp;<span class="icon">chevron_right</span></button>
+        <select id="pageSize" class="page-size" aria-label="페이지 크기">
+          <option value="10">10개/페이지</option>
+          <option value="25" selected>25개/페이지</option>
+          <option value="50">50개/페이지</option>
+          <option value="100">100개/페이지</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn danger" id="clearEdits" title="자동저장 초기화">⚠️ 편집본 초기화</button>
+        <span class="help">※ 자동 저장/Undo(5초)</span>
+      </div>
+      <span id="ver"></span>
+    </div>
+  </div>
+
+  <!-- Mobile FAB -->
+  <div class="fab" id="fab" style="display:none">
+    <button class="btn" id="fabExport"><span class="icon">ios_share</span>&nbsp;내보내기</button>
+    <button class="btn ghost" id="fabRestore"><span class="icon">settings_backup_restore</span>&nbsp;선택 복구</button>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+<script defer src="app_csp.js"></script>
+  <script defer src="persist_patch_v2_2.js"></script>
+  <script defer src="persist_backup.js"></script>
+<!-- FAB Add Case -->
+<div class="fab-add" aria-hidden="false">
+  <button id="fabAddCase" type="button" aria-label="새 사례 추가">
+    <span class="icon">add</span>
+  </button>
+</div>
+
+
+<!-- Add Case Modal -->
+<div id="addModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+  <div class="modal-card">
+    <div class="modal-head">
+      <strong id="addTitle">새 민원 사례 추가</strong>
+      <button id="addClose" class="btn ghost" type="button" aria-label="닫기"><span class="icon">close</span></button>
+    </div>
+    <div class="modal-body">
+      <div class="grid">
+        <label>카테고리
+          <input id="addCat" type="text" placeholder="예: 상담, 시설, 안내 등" />
+        </label>
+        <label>상태
+          <select id="addSt">
+            <option value="대기">대기</option>
+            <option value="진행">진행</option>
+            <option value="완료">완료</option>
+          </select>
+        </label>
+      </div>
+      <label>민원 사례(필수)
+        <textarea id="addQ" rows="5" placeholder="민원 사례를 입력하세요"></textarea>
+      </label>
+      <label>응답(선택)
+        <textarea id="addA" rows="5" placeholder="응답(템플릿/자유 입력)"></textarea>
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button id="addSubmit" class="btn primary" type="button" aria-label="사례 추가">추가</button>
+      <button id="addCancel" class="btn ghost" type="button">취소</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
