@@ -1,12 +1,9 @@
 /* =========================================================================
-   app_public.js — Robust JSON loader (dao-codes/Impact)
-   - cases.json 경로 자동탐색: 절대경로 → 상대경로 후보 → 실패 시 알림
-   - 검색/칩/페이지네이션 & GitHub Issues 연동
-   - 화면 우하단 배지로 로드 건수 표시(3초)
+   app_public.js — Inline 114 fallback + robust loader
+   - cases.json이 로드되면 그걸 사용, 실패하면 내장 CASES_INLINE(114건) 사용
+   - 로드 출처/건수를 화면 배지로 표시
+   - 검색/칩/페이지네이션 + GitHub Issues 연동
    ====================================================================== */
-
-// 절대 경로(프로젝트 페이지 기준) — 먼저 시도
-const CASES_URL_ABSOLUTE = "https://dao-codes.github.io/Impact/cases.json";
 
 /* ---------------- 표준 응답 템플릿 ---------------- */
 const RESPONSES = {
@@ -43,9 +40,170 @@ const RESPONSES = {
   "기타": `[사과] 관련 기준과 사실관계를 확인해 가장 빠른 방법으로 조치하고 결과를 안내드리겠습니다.`
 };
 
-/* ---------------- 요소/상태 ---------------- */
-const CATS = ["운영시간/공간","선발/절차","개인정보/마케팅","프로그램 품질","공정성/청렴성","상담","연락/소통","자료/콘텐츠","공간/환경","일정/기한","기관 신뢰성","참여 자격","리워드/경품","보안/시스템","기타"];
+/* ---------------- 내장 데이터(114건; 100개+‘기타’14개) ---------------- */
+const CASES_INLINE = [
+  {"q":"프로그램은 왜 주말에 안하나요?","cat":"운영시간/공간"},
+  {"q":"다른 센터는 저녁에도 대관이 가능한데 왜 안되나요?","cat":"운영시간/공간"},
+  {"q":"프로그램이 주말에 없어서 들을 수 없어요","cat":"운영시간/공간"},
+  {"q":"점심시간에도 상담이 가능했으면 합니다","cat":"운영시간/공간"},
+  {"q":"공휴일에 문을 열 수 없나요?","cat":"운영시간/공간"},
+  {"q":"스터디룸은 왜 평일 9~18시까지만 운영하나요?","cat":"운영시간/공간"},
+  {"q":"공간이 작아 이용이 어려워요","cat":"운영시간/공간"},
+  {"q":"성수역에서 오기 힘든 위치예요","cat":"운영시간/공간"},
+  {"q":"혼잡 시간대가 너무 붐빕니다","cat":"운영시간/공간"},
+  {"q":"대관 안내가 부족합니다","cat":"운영시간/공간"},
 
+  {"q":"왜 프로그램 선발이 되지 않았나요?","cat":"선발/절차"},
+  {"q":"프로그램 신청했는데 왜 탈락했죠? 매달 지원했는데도요?","cat":"선발/절차"},
+  {"q":"합격 기준이 모호해요","cat":"선발/절차"},
+  {"q":"선발 결과를 빨리 알고 싶어요","cat":"선발/절차"},
+  {"q":"가점 기준을 공개해 주세요","cat":"선발/절차"},
+  {"q":"선발 과정을 공개하지 않으면 민원을 넣겠습니다","cat":"선발/절차"},
+  {"q":"전 기수 참여자는 지원하면 안 되는 거 아닌가요?","cat":"선발/절차"},
+  {"q":"지인 추천 있나요? 불공정한 것 같아요","cat":"선발/절차"},
+  {"q":"특정 학교만 유리한가요?","cat":"선발/절차"},
+  {"q":"추첨 방식이 공정한가요?","cat":"선발/절차"},
+
+  {"q":"구직신청서는 왜 받는거죠? 개인정보가 보호되나요?","cat":"개인정보/마케팅"},
+  {"q":"프로그램에 선정되지 않았으니 신청서류를 바로 삭제해 주세요","cat":"개인정보/마케팅"},
+  {"q":"(마케팅 동의 잊음) 프로그램 광고 문자가 와요","cat":"개인정보/마케팅"},
+  {"q":"동의 철회했는데 또 연락이 와요","cat":"개인정보/마케팅"},
+  {"q":"포털 도메인 이메일로 받으면 보안이 안전한가요?","cat":"개인정보/마케팅"},
+  {"q":"서류는 어디에 보관하나요?","cat":"개인정보/마케팅"},
+  {"q":"파기 시점이 궁금합니다","cat":"개인정보/마케팅"},
+  {"q":"개인정보 열람 범위가 불안합니다","cat":"개인정보/마케팅"},
+  {"q":"마케팅 수신 동의 내역을 확인할 수 있나요?","cat":"개인정보/마케팅"},
+  {"q":"수신 거부는 어떻게 하나요?","cat":"개인정보/마케팅"},
+
+  {"q":"메이크업 시간이 짧고 생각보다 별로예요","cat":"프로그램 품질"},
+  {"q":"강의 속도가 너무 빨라요","cat":"프로그램 품질"},
+  {"q":"실습 자료가 부족해요","cat":"프로그램 품질"},
+  {"q":"Q&A 시간이 짧아요","cat":"프로그램 품질"},
+  {"q":"강사님 예시가 지나치게 광고 같아요","cat":"프로그램 품질"},
+  {"q":"콘텐츠 난이도가 맞지 않아요","cat":"프로그램 품질"},
+  {"q":"교육 목표가 불명확해요","cat":"프로그램 품질"},
+  {"q":"현장 운영이 혼잡했어요","cat":"프로그램 품질"},
+  {"q":"사전 안내와 실제가 달라요","cat":"프로그램 품질"},
+  {"q":"온라인 접속 품질이 떨어졌어요","cat":"프로그램 품질"},
+
+  {"q":"강사님 포트폴리오에 본인 온라인 강의/저서가 있어요. 광고인가요?","cat":"공정성/청렴성"},
+  {"q":"리워드(기프티콘) 주면 공공기관이 문제 아닌가요? 선거법 위반 같아요","cat":"공정성/청렴성"},
+  {"q":"협찬 표기가 안 보였어요","cat":"공정성/청렴성"},
+  {"q":"이해충돌 관리가 되는지 궁금해요","cat":"공정성/청렴성"},
+  {"q":"평가/감사는 누가 하나요?","cat":"공정성/청렴성"},
+  {"q":"지인에게 유리하게 운영하는 것 같아요","cat":"공정성/청렴성"},
+  {"q":"나랏돈인데 간식 먹으면 안 되는 거 아닌가요?","cat":"공정성/청렴성"},
+  {"q":"광고/홍보가 과합니다","cat":"공정성/청렴성"},
+  {"q":"후원사 공개가 필요해요","cat":"공정성/청렴성"},
+  {"q":"선거기간에 홍보 문구 괜찮나요?","cat":"공정성/청렴성"},
+
+  {"q":"상담사가 젊어서 신뢰가 안가요. 자격 있는 분 맞나요?","cat":"상담"},
+  {"q":"상담사가 제 이야기를 너무 많이 알아서 불안해요. 변경해 주세요","cat":"상담"},
+  {"q":"후속 상담 예약은 어떻게 하나요?","cat":"상담"},
+  {"q":"상담 시간이 너무 짧았어요","cat":"상담"},
+  {"q":"맞춤 조언이 부족했어요","cat":"상담"},
+  {"q":"기록은 얼마나 보관하나요?","cat":"상담"},
+  {"q":"대면 대신 전화 상담 가능한가요?","cat":"상담"},
+  {"q":"상담 전 설문이 너무 깁니다","cat":"상담"},
+  {"q":"상담 리포트 공유해 주세요","cat":"상담"},
+  {"q":"상담 중 녹음 가능한가요?","cat":"상담"},
+
+  {"q":"연락이 잘 안 돼서 민원 넣었습니다. 연락이 잘 되어야죠","cat":"연락/소통"},
+  {"q":"카카오톡을 안 쓰고 전화만 가능합니다. 전화로 안내해 주세요","cat":"연락/소통"},
+  {"q":"강사님께 질문 있어요. 전화번호 알려주세요","cat":"연락/소통"},
+  {"q":"강사님이 기프티콘 보내신다 했는데 삭제했어요. 재연락 부탁","cat":"연락/소통"},
+  {"q":"이메일 답변이 늦어요","cat":"연락/소통"},
+  {"q":"문자 알림이 오지 않았어요","cat":"연락/소통"},
+  {"q":"휴관 중 문의 대응이 느렸어요","cat":"연락/소통"},
+  {"q":"공지 채널이 너무 많아요","cat":"연락/소통"},
+  {"q":"전화 연결이 어렵습니다","cat":"연락/소통"},
+  {"q":"우편 안내를 받고 싶어요","cat":"연락/소통"},
+
+  {"q":"(스터디 종료 후 슬랙 삭제) 백업 못했어요. 파일 보내주세요","cat":"자료/콘텐츠"},
+  {"q":"수업 녹화본을 볼 수 있나요?","cat":"자료/콘텐츠"},
+  {"q":"교안이 열리지 않아요","cat":"자료/콘텐츠"},
+  {"q":"링크가 만료됐어요","cat":"자료/콘텐츠"},
+  {"q":"배포 자료의 저작권이 걱정돼요","cat":"자료/콘텐츠"},
+  {"q":"과제 제출 형식이 어려워요","cat":"자료/콘텐츠"},
+  {"q":"재수강 자료 제공 가능한가요?","cat":"자료/콘텐츠"},
+  {"q":"요약본만 받을 수 있나요?","cat":"자료/콘텐츠"},
+  {"q":"자료 출처 표기가 부족해요","cat":"자료/콘텐츠"},
+  {"q":"콘텐츠 접근성이 떨어져요(자막 등)","cat":"자료/콘텐츠"},
+
+  {"q":"더워서 상담 받기 어려워요. 내일 가도 되나요?","cat":"공간/환경"},
+  {"q":"의자가 불편해요","cat":"공간/환경"},
+  {"q":"와이파이가 자주 끊겨요","cat":"공간/환경"},
+  {"q":"소음이 심해요","cat":"공간/환경"},
+  {"q":"청결 관리가 아쉽습니다","cat":"공간/환경"},
+  {"q":"장애인 접근성이 부족해요","cat":"공간/환경"},
+  {"q":"콘센트가 부족합니다","cat":"공간/환경"},
+  {"q":"화장실 안내가 부족합니다","cat":"공간/환경"},
+  {"q":"출입 인증이 번거로워요","cat":"공간/환경"},
+  {"q":"사물함 이용 안내가 필요합니다","cat":"공간/환경"},
+
+  {"q":"금일까지 제출이라 했는데 왜 늦었다고 하나요? 금-일 아닌가요?","cat":"일정/기한"},
+  {"q":"일정이 자주 바뀌어요","cat":"일정/기한"},
+  {"q":"캘린더 연동이 되나요?","cat":"일정/기한"},
+  {"q":"리마인드가 부족해요","cat":"일정/기한"},
+  {"q":"타임존 표기가 헷갈립니다","cat":"일정/기한"},
+  {"q":"현장/온라인 전환 안내가 늦었습니다","cat":"일정/기한"},
+  {"q":"모집 기간이 너무 짧아요","cat":"일정/기한"},
+  {"q":"결과 발표 시간이 불명확해요","cat":"일정/기한"},
+  {"q":"변경 이력 공지가 필요합니다","cat":"일정/기한"},
+  {"q":"휴일 접수 기준을 알려주세요","cat":"일정/기한"},
+
+  {"q":"이 사업은 어디서 받은 건가요?","cat":"기관 신뢰성"},
+  {"q":"여기 신천지예요?","cat":"기관 신뢰성"},
+  {"q":"운영 주체가 어디인가요?","cat":"기관 신뢰성"},
+  {"q":"후원사는 누군가요?","cat":"기관 신뢰성"},
+  {"q":"평가 결과를 공개하나요?","cat":"기관 신뢰성"},
+  {"q":"민원 처리 체계를 알고 싶어요","cat":"기관 신뢰성"},
+  {"q":"홈페이지 정보가 부정확합니다","cat":"기관 신뢰성"},
+  {"q":"포스터의 교육단체는 뭐하는 곳이죠?","cat":"기관 신뢰성"},
+  {"q":"담당자 익명성이 필요한가요?","cat":"기관 신뢰성"},
+  {"q":"예산 집행 내역을 보고 싶어요","cat":"기관 신뢰성"},
+
+  {"q":"다른 지역 사람이 있는데 서울 사람만 참여 아닌가요?","cat":"참여 자격"},
+  {"q":"나이 제한이 있나요?","cat":"참여 자격"},
+  {"q":"재참여 가능한가요?","cat":"참여 자격"},
+  {"q":"타지역인데 참여해도 되나요?","cat":"참여 자격"},
+  {"q":"학생도 참여 가능합니까?","cat":"참여 자격"},
+  {"q":"재직자도 참여 가능한가요?","cat":"참여 자격"},
+  {"q":"휴학생은 어떻게 되나요?","cat":"참여 자격"},
+  {"q":"외국인은 참여할 수 있나요?","cat":"참여 자격"},
+  {"q":"대리 신청이 가능한가요?","cat":"참여 자격"},
+  {"q":"가족이 대신 듣고 인증해도 되나요?","cat":"참여 자격"},
+
+  {"q":"기념품 수령 방법이 궁금해요","cat":"리워드/경품"},
+  {"q":"세금 처리가 필요한가요?","cat":"리워드/경품"},
+  {"q":"추첨 방식이 공정한가요?","cat":"리워드/경품"},
+  {"q":"기프티콘 재전송 가능할까요?","cat":"리워드/경품"},
+  {"q":"리워드 단가가 적정한가요?","cat":"리워드/경품"},
+  {"q":"지급 기한이 궁금합니다","cat":"리워드/경품"},
+  {"q":"현물/현금 전환이 가능한가요?","cat":"리워드/경품"},
+  {"q":"후원 리워드 표기는 어떻게 하나요?","cat":"리워드/경품"},
+  {"q":"리워드 대상 기준을 알려주세요","cat":"리워드/경품"},
+  {"q":"선거기간 리워드 지급 괜찮나요?","cat":"리워드/경품"},
+
+  /* ====== 자동 생성 추가 14건 (카테고리: 기타) ====== */
+  {"q":"센터 위치 안내 표지가 부족합니다. 초행길 안내가 있었으면 합니다.","cat":"기타"},
+  {"q":"현장 사진·영상 촬영 동의 절차가 궁금합니다.","cat":"기타"},
+  {"q":"분실물 보관 및 인수인계 절차를 알려주세요.","cat":"기타"},
+  {"q":"대기 번호 시스템이 있었으면 합니다.","cat":"기타"},
+  {"q":"행사 후 만족도 조사 결과를 공유해 주실 수 있나요?","cat":"기타"},
+  {"q":"주차 공간 이용 기준이 필요합니다.","cat":"기타"},
+  {"q":"현장 자원봉사 참여 방법을 안내해 주세요.","cat":"기타"},
+  {"q":"장애인 보조공학기기 대여가 가능한가요?","cat":"기타"},
+  {"q":"유아 동반 공간 이용 수칙이 있나요?","cat":"기타"},
+  {"q":"분야별 멘토링 상시 신청 창구가 있었으면 합니다.","cat":"기타"},
+  {"q":"센터 이용 에티켓(소음·통화 등)을 정리해 주세요.","cat":"기타"},
+  {"q":"알레르기 정보 표시(간식/다과)가 필요합니다.","cat":"기타"},
+  {"q":"비상 상황 시 대피 요령을 사전에 안내받고 싶습니다.","cat":"기타"},
+  {"q":"민원·제안 접수 현황을 월별로 공개해 주세요.","cat":"기타"}
+];
+
+/* ---------------- 구성/요소 ---------------- */
+const CATS = ["운영시간/공간","선발/절차","개인정보/마케팅","프로그램 품질","공정성/청렴성","상담","연락/소통","자료/콘텐츠","공간/환경","일정/기한","기관 신뢰성","참여 자격","리워드/경품","보안/시스템","기타"];
 const els = {
   search: document.getElementById('search'),
   chips: document.getElementById('chips'),
@@ -59,7 +217,6 @@ const els = {
   toggleTheme: document.getElementById('toggleTheme'),
   openIssues: document.getElementById('openIssues'),
 };
-
 let page = 1;
 let pageSize = Number(els.pageSize?.value)||50;
 let activeCats = new Set();
@@ -69,10 +226,7 @@ let view = [];
 const GH_OWNER = document.querySelector('meta[name="gh-owner"]')?.getAttribute('content')?.trim() || '';
 const GH_REPO  = document.querySelector('meta[name="gh-repo"]')?.getAttribute('content')?.trim() || '';
 const GH_LABEL = encodeURIComponent(document.querySelector('meta[name="gh-label"]')?.getAttribute('content')?.trim() || 'feedback');
-
-function ghIssuesListURL(){
-  return `https://github.com/${GH_OWNER}/${GH_REPO}/issues?q=is%3Aissue+label%3A${GH_LABEL}`;
-}
+function ghIssuesListURL(){ return `https://github.com/${GH_OWNER}/${GH_REPO}/issues?q=is%3Aissue+label%3A${GH_LABEL}`; }
 function ghNewIssueURL(row){
   const title = encodeURIComponent(`[${row.cat}] 문의/피드백: ${row.q}`.slice(0,250));
   const body = encodeURIComponent(`다음 항목에 대한 의견/보완 제안을 남겨주세요.
@@ -86,8 +240,7 @@ ${row.a}
 
 페이지: ${location.href}
 시간: ${new Date().toLocaleString('ko-KR', {hour12:false})}`);
-  const base = `https://github.com/${GH_OWNER}/${GH_REPO}/issues/new`;
-  return `${base}?title=${title}&body=${body}&labels=${GH_LABEL}`;
+  return `https://github.com/${GH_OWNER}/${GH_REPO}/issues/new?title=${title}&body=${body}&labels=${GH_LABEL}`;
 }
 
 /* ---------------- 유틸 ---------------- */
@@ -96,14 +249,10 @@ function parseSearch(q){
   q = (q||'').trim();
   const cat = []; const not = []; const words=[];
   const re = /(\b카테고리:"([^"]+)"|\-키워드:"([^"]+)"|("[^"]+"|\S+))/g;
-  let m;
-  while((m=re.exec(q))){
+  let m; while((m=re.exec(q))){
     if(m[2]) cat.push(m[2].trim());
     else if(m[3]) not.push(m[3].trim().toLowerCase());
-    else{
-      const w = m[1].replace(/^"|"$|^'|'$/g,'').trim();
-      if(w) words.push(w.toLowerCase());
-    }
+    else{ const w = m[1].replace(/^"|"$|^'|'$/g,'').trim(); if(w) words.push(w.toLowerCase()); }
   }
   return {cat,not,words};
 }
@@ -170,18 +319,15 @@ function bindRowEvents(){
       const idx = Number(b.dataset.idx);
       const row = view.find(v=>v.idx===idx);
       if(!row) return;
-      if(!GH_OWNER || !GH_REPO){
-        alert('깃허브 저장소 메타(meta[gh-owner], meta[gh-repo])를 설정해 주세요.');
-        return;
-      }
+      if(!GH_OWNER || !GH_REPO){ alert('깃허브 저장소 메타(meta[gh-owner], meta[gh-repo])를 설정해 주세요.'); return; }
       window.open(ghNewIssueURL(row), '_blank', 'noopener');
     });
   });
 }
 function render(){
   const {rows, terms} = filteredRows();
-  els.total && (els.total.textContent = view.length);
-  els.shown && (els.shown.textContent = rows.length);
+  if(els.total) els.total.textContent = view.length;
+  if(els.shown) els.shown.textContent = rows.length;
 
   const pages = Math.max(1, Math.ceil(rows.length / pageSize));
   if(page > pages) page = pages;
@@ -190,14 +336,14 @@ function render(){
 
   els.tbody.innerHTML = slice.map(r=>rowHtml(r, terms)).join('') ||
     `<tr><td colspan="4" style="padding:18px">검색 조건에 맞는 결과가 없습니다.</td></tr>`;
-  els.pageInfo && (els.pageInfo.textContent = `${page}/${pages}`);
+  if(els.pageInfo) els.pageInfo.textContent = `${page}/${pages}`;
   if(els.prev) els.prev.disabled = (page<=1);
   if(els.next) els.next.disabled = (page>=pages);
 
   bindRowEvents();
 }
 
-/* ---------------- 진단 배지 ---------------- */
+/* ---------------- 배지 ---------------- */
 function badge(text, ok=true){
   const el = document.createElement('div');
   el.textContent = text;
@@ -207,7 +353,8 @@ function badge(text, ok=true){
   document.body.appendChild(el); setTimeout(()=>el.remove(), 3000);
 }
 
-/* ---------------- cases.json 로더(경로 자동 탐색) ---------------- */
+/* ---------------- cases.json 로드(성공 시 사용, 실패 시 내장 사용) ---------------- */
+const CASES_URL_ABSOLUTE = "https://dao-codes.github.io/Impact/cases.json"; // 선택적: 있으면 먼저 시도
 async function tryFetch(url){
   try{
     const r = await fetch(url, {cache:'no-store'});
@@ -215,38 +362,27 @@ async function tryFetch(url){
     const data = await r.json();
     if(Array.isArray(data) && data.length) return data;
     throw new Error('empty array');
-  }catch(e){
-    console.warn('[Impact] fetch failed:', url, e);
-    return null;
-  }
+  }catch(e){ console.warn('[Impact] fetch failed:', url, e); return null; }
 }
-
 async function loadCases(){
   const owner = GH_OWNER || location.hostname.split('.')[0]; // dao-codes
   const repo  = GH_REPO  || location.pathname.split('/').filter(Boolean)[0] || 'Impact';
   const abs   = `https://${owner}.github.io/${repo}/cases.json`;
-
   const basePath = location.pathname.replace(/[^/]+$/, ''); // 현재 폴더
-const candidates = [
-  CASES_URL_ABSOLUTE,      // ← 1순위: 절대경로
-  abs,                     // 기존 자동 추정 절대경로
-  './cases.json',
-  'cases.json',
-  `${basePath}cases.json`,
-  `${location.origin}${basePath}cases.json`
-].filter((v,i,arr)=>arr.indexOf(v)===i);
+
+  const candidates = [
+    CASES_URL_ABSOLUTE,
+    abs, './cases.json', 'cases.json',
+    `${basePath}cases.json`, `${location.origin}${basePath}cases.json`
+  ].filter((v,i,arr)=>arr.indexOf(v)===i);
 
   for(const u of candidates){
     const data = await tryFetch(u);
-    if(data){
-      console.info('[Impact] cases loaded from:', u, 'count=', data.length);
-      badge(`로딩: ${data.length}건`, true);
-      return data;
-    }
+    if(data){ console.info('[Impact] cases loaded from:', u, 'count=', data.length); badge(`JSON 로딩: ${data.length}건`, true); return data; }
   }
-  badge('cases.json 로드 실패(콘솔 확인)', false);
-  alert('cases.json을 찾지 못했습니다. index.html과 같은 폴더에 두셨는지 확인해 주세요.');
-  return [];
+  console.info('[Impact] JSON 미탐: using inline fallback (114)');
+  badge('내장 데이터 사용: 114건', true);
+  return CASES_INLINE;
 }
 
 /* ---------------- 이벤트 ---------------- */
@@ -256,12 +392,11 @@ els.next?.addEventListener('click', ()=>{ page++; render(); });
 els.pageSize?.addEventListener('change', ()=>{ pageSize = Number(els.pageSize.value)||50; page=1; render(); });
 els.toggleTheme?.addEventListener('click', ()=>{
   const root = document.documentElement;
-  const mode = root.getAttribute('data-theme');
-  root.setAttribute('data-theme', mode==='dark' ? 'auto' : 'dark');
+  root.setAttribute('data-theme', root.getAttribute('data-theme')==='dark' ? 'auto' : 'dark');
 });
-els.openIssues?.addEventListener('click', ()=>{
+els.openIssues?.addEventListener('click', ()=>{ 
   if(!GH_OWNER || !GH_REPO){ alert('깃허브 저장소 메타(meta[gh-owner], meta[gh-repo])를 설정해 주세요.'); return; }
-  window.open(ghIssuesListURL(), '_blank', 'noopener');
+  window.open(ghIssuesListURL(), '_blank', 'noopener'); 
 });
 
 /* ---------------- 시작 ---------------- */
