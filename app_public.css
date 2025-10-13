@@ -281,3 +281,80 @@ body.list-mode .q, body.list-mode .resp{
   body.list-mode td .row-actions{ grid-template-columns:1fr; }
 }
 
+/* =========================
+   1) 필터(태그) 아래로 콘텐츠가 파고드는 문제 방지
+   - sticky 상태에서도 항상 하단 여백이 유지되도록 pseudo spacer 사용
+   ========================= */
+.filters{
+  z-index: 40;                 /* 카드 위로 안전하게 */
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 70%, transparent);
+}
+.filters::after{
+  content: "";
+  display: block;
+  height: 12px;                /* ← 이 값이 '태그 아래 간격' */
+}
+
+/* 스크롤 위치 보정: 카드가 sticky 영역에 가려지지 않게 */
+body.list-mode tbody tr{
+  scroll-margin-top: calc(var(--sticky-toolbar) + var(--sticky-filters) + 12px);
+}
+
+/* =========================
+   2) 카드형 UI 가독성/밀도 개선
+   ========================= */
+
+/* 카드 기본 여백과 그리드 간격 */
+body.list-mode tbody tr{
+  gap: 0 8px;                  /* 열 간격 소폭 확보 */
+}
+
+/* 번호 칸(더 콤팩트) */
+body.list-mode td[data-h="#"]{
+  font-size: 13px;
+}
+
+/* 질문(민원 사례) 강조 + 하단 여백 */
+body.list-mode .q{
+  margin: 0 0 6px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+body.list-mode .cat{
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* 가이드 본문 가독성 */
+body.list-mode .resp{
+  line-height: 1.55;
+}
+
+/* 카드 내 버튼 영역: 버튼 사이 간격/정렬 */
+body.list-mode td .row-actions{
+  gap: 10px;
+}
+body.list-mode td .row-actions .btn{
+  min-height: 40px;
+  font-weight: 700;
+}
+
+/* =========================
+   3) 반응형 미세 조정
+   ========================= */
+@media (max-width: 960px){
+  /* 버튼 2개가 옆으로 너무 넓으면 자동으로 아래로 줄바꿈되지 않게 */
+  body.list-mode td .row-actions{ grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px){
+  /* 모바일에서 칩이 2~3줄일 때도 겹침 방지 (이미 JS 보정이 있더라도 안전 여유) */
+  :root{ --sticky-filters: 118px; }
+  .filters::after{ height: 10px; }  /* 모바일은 간격 약간 축소 */
+
+  /* 카드 내부 여백 살짝 축소 */
+  body.list-mode tbody td{ padding: 12px 14px !important; }
+  body.list-mode .q{ font-size: 15px; }
+}
+
