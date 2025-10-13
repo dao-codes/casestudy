@@ -208,3 +208,131 @@ td .row-actions{ display:flex; flex-direction:column; gap:6px; }
     top: var(--sticky-offset);
   }
 }
+
+/* =========================================================================
+   LIST MODE (Table → Card List)
+   - thead 숨김, sticky 해제
+   - 각 tr을 카드처럼 표시 (그리드)
+   - 데스크톱/모바일 반응형
+   ======================================================================= */
+
+/* 0) 테이블의 기본 박스는 투명/여백만 유지 */
+table{
+  border: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  width: 100%;
+}
+
+/* 1) 헤더는 리스트형에서는 숨김 + sticky 완전 해제 */
+thead{ display: none !important; }
+thead th{
+  position: static !important;
+  top: auto !important;
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 2) tbody를 세로 리스트 컨테이너로 */
+tbody{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;                     /* 카드 간격 */
+}
+
+/* 3) 각 행을 '카드'로 표시 (그리드 4열) */
+tbody tr{
+  display: grid;
+  grid-template-columns: 56px 1fr 1fr 200px;   /* 번호 / 사례 / 가이드 / 버튼 */
+  align-items: start;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+/* 4) 셀 스타일(테두리 제거, 여백만) */
+tbody td{
+  border: none !important;
+  padding: 14px 16px !important;
+  background: transparent !important;
+  font-size: 15px;
+}
+
+/* 5) 첫 번째 열(#)을 뱃지 느낌으로 */
+td[data-h="#"]{
+  width: 56px !important;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 800;
+  background: color-mix(in oklab, var(--primary-weak) 30%, transparent);
+}
+
+/* 6) 내용 타이포 정리 */
+.q{ font-weight: 800; letter-spacing: -0.2px; }
+.cat{
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.resp{ white-space: pre-wrap; word-break: keep-all; }
+
+/* 7) 카드 안의 버튼 묶음 */
+td .row-actions{
+  display: grid !important;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+td .row-actions .btn{ width: 100%; }
+
+/* 8) 호버 효과(카드 배경) */
+tbody tr:hover{
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  border-color: color-mix(in oklab, var(--primary) 30%, var(--line));
+}
+
+/* 9) 모바일(≤ 960px): 가이드 영역이 길어지므로 2열로 재배치 */
+@media (max-width: 960px){
+  tbody tr{
+    grid-template-columns: 44px 1fr;   /* 번호 + 본문 */
+    grid-template-areas:
+      "no   q"
+      "no   a"
+      "no   act";
+  }
+  td[data-h="#"]{ grid-area: no; width: 44px !important; }
+  tbody td:nth-child(2){ grid-area: q; }     /* 민원 사례 */
+  tbody td:nth-child(3){ grid-area: a; }     /* 가이드 */
+  tbody td:nth-child(4){ grid-area: act; }   /* 버튼 */
+  td .row-actions{ grid-template-columns: 1fr 1fr; }
+}
+
+/* 10) 모바일(≤ 640px): 세로 스택 + 버튼 1열 */
+@media (max-width: 640px){
+  tbody tr{
+    grid-template-columns: 40px 1fr;
+    grid-template-areas:
+      "no   q"
+      "no   a"
+      "no   act";
+  }
+  td[data-h="#"]{ width: 40px !important; padding: 12px 8px !important; }
+  td .row-actions{ grid-template-columns: 1fr; }  /* 버튼 한 줄씩 */
+  .q, .resp{ font-size: 14px; }
+}
+
+/* 11) 기존 sticky thead 보정은 비활성화 되었으므로,
+       상단 고정은 '검색/필터'만 유지 (아래 두 줄은 유지 권장) */
+.toolbar{ position: sticky; top: 0; z-index: 30; background: var(--bg); border-bottom: 1px solid var(--line); }
+.filters{ position: sticky; top: var(--sticky-toolbar); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+
+    
