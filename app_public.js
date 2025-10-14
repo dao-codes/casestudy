@@ -3,42 +3,122 @@
    - 외부 fetch, cases.json 의존 완전 제거
    - 검색/칩/페이지네이션 유지
    - 카드 액션: [복사하기] (의견/피드백 버튼 제거)
-   - index.html 끝에서 로드 + 캐시무효화 쿼리 권장 (?v=list-copy-1)
+   - index.html 끝에서 로드 + 캐시무효화 쿼리 권장 (?v=list-copy-2)
+   - 업데이트: 응답 템플릿 고도화(이해→즉시조치→근거→후속약속) + 요약본 + 개인화 토큰
    ====================================================================== */
 
-/* ---------- 표준 응답 템플릿 ---------- */
+/* ---------- 표준 응답 템플릿 (상세) ----------
+   공통 토큰: {name} {program} {date} {time} {policy_link} {alt_link} {contact}
+   톤: 공적·전문 / 행동 중심 / 법·예산·선거법 리스크 회피
+-------------------------------------------------------------------------- */
 const RESPONSES = {
-  "운영시간/공간": `[사과] 이용 시간으로 불편을 드려 죄송합니다.
-[근거] 예산·인력·안전 지침에 따라 현 시간대를 운영 중입니다.
-[대안] 야간·주말 확대 수요를 수집하여 차기 편성에 반영하겠습니다.`,
-  "선발/절차": `[사과] 기대에 미치지 못해 죄송합니다.
-[근거] 공지된 기준(우선·추첨·가점 등)에 따라 진행했습니다.
-[대안] 다음 모집 일정·준비 팁을 안내드리며, 요청 시 개인정보를 제외한 요약 사유를 제공하겠습니다.`,
-  "개인정보/마케팅": `[안내] 최소 수집·암호화 보관·접근 통제로 보호합니다.
-[조치] 수신 거부·삭제 요청 즉시 처리하고 결과를 안내드리겠습니다.`,
-  "프로그램 품질": `[사과] 품질이 기대에 미치지 못했습니다.
-[조치] 강의 속도·자료·Q&A를 보완하고 필요 시 보완 세션/자료를 제공합니다.`,
-  "공정성/청렴성": `[안내] 이해충돌 방지·협찬 표기·청렴 지침을 준수합니다.
-[조치] 사실관계를 점검하고 필요한 경우 시정 조치를 시행하겠습니다.`,
-  "상담": `[원칙] 비밀보장·최소 열람 원칙을 준수합니다.
-[대안] 상담사 변경 가능하며 기록 범위를 재설정해 진행하겠습니다.`,
-  "연락/소통": `[사과] 연락 지연에 대해 사과드립니다.
-[대안] 전화/우편 등 대체 수단 제공, 24~48시간 내 회신 원칙을 재안내하겠습니다.`,
-  "자료/콘텐츠": `[안내] 운영 기간 내 자료 제공이 원칙입니다.
-[대안] 권한 복구·재전달 가능 범위를 검토하고 링크를 갱신하겠습니다.`,
-  "공간/환경": `[사과] 시설·환경으로 불편을 드렸습니다.
-[조치] 즉시 점검하고 혼잡 시간·대체 좌석 등을 안내하겠습니다.`,
-  "일정/기한": `[사과] 일정 표기 혼선 개선하겠습니다.
-[원칙] 마감은 절대시각(예: 금 18:00) 기준이며 리마인드를 강화하겠습니다.`,
-  "기관 신뢰성": `[안내] (구/시) 위탁 공공기관으로 특정 종교·영리와 무관합니다.
-[근거] 운영 주체·사업 공고문을 안내하겠습니다.`,
-  "참여 자격": `[안내] 공고 범위 내 광역·타지역 청년 참여가 가능합니다.
-[조치] 세부 요건을 다시 안내드리겠습니다.`,
-  "리워드/경품": `[안내] 소액 기념품은 지침 범위 내 운영합니다.
-[근거] 지급 기준·절차를 공개하고 오해가 없도록 고지 문구를 보완하겠습니다.`,
-  "보안/시스템": `[사과] 시스템 불편을 확인했습니다.
-[조치] 원인을 파악·복구하고 자동저장/대체 경로를 안내하겠습니다.`,
-  "기타": `[사과] 관련 기준과 사실관계를 확인해 가장 빠른 방법으로 조치하고 결과를 안내드리겠습니다.`
+  "운영시간/공간":
+`[이해] {name}님, 이용 시간으로 불편을 겪으신 점 이해합니다.
+[즉시조치] ‘혼잡 시간대/대체 좌석/가용 공간’ 정보를 오늘 기준으로 갱신해 안내드리겠습니다.
+[근거] 현재 운영은 안전·인력·예산 지침에 따라 {time} 중심으로 편성되어 있습니다({policy_link}).
+[후속약속] 야간·주말 수요를 수집해 다음 분기 편성안에 반영하고 결과를 공지하겠습니다.`,
+
+  "선발/절차":
+`[이해] {program} 선발 결과가 기대에 미치지 못해 실망하셨을 것 같습니다.
+[즉시조치] 요청 주시면 개인정보를 제외한 요약 사유·준비 팁을 개별 안내드리겠습니다({contact}).
+[근거] 공지된 기준(우선·추첨·가점)에 따라 외부 검증 로직으로 처리했습니다({policy_link}).
+[후속약속] 다음 모집 일정과 체크리스트를 사전 고지하고, 결과 발표 시간을 ‘절대시각’으로 명확히 표기하겠습니다.`,
+
+  "개인정보/마케팅":
+`[이해] 정보 보호와 수신 설정에 대해 걱정되실 수 있습니다.
+[즉시조치] 수신 거부·삭제 요청을 접수 즉시 처리하고 처리 결과를 회신드리겠습니다({contact}).
+[근거] 최소 수집·암호화 보관·접근 통제 기준에 따라 운영합니다({policy_link}).
+[후속약속] 마케팅 동의 내역 조회·변경 경로를 고지하고, 반복 발송 방지 점검을 강화하겠습니다.`,
+
+  "프로그램 품질":
+`[이해] {program} 진행 품질이 기대에 미치지 못했습니다.
+[즉시조치] 속도·자료·Q&A 배분을 조정하고, 필요 시 보완 세션/추가 자료를 제공하겠습니다({alt_link}).
+[근거] 사전·사후 만족도와 현장 피드백을 반영해 커리큘럼을 개편 중입니다.
+[후속약속] 난이도·목표·평가 기준을 사전에 명확화하고, 강사 가이드의 광고성 예시를 제한하겠습니다.`,
+
+  "공정성/청렴성":
+`[이해] 공정성과 청렴성은 신뢰의 핵심입니다.
+[즉시조치] 해당 사안을 사실관계부터 점검해 필요 시 시정·공개 조치하겠습니다.
+[근거] 이해충돌 방지·협찬 표기·선거법·청렴 지침을 준수합니다({policy_link}).
+[후속약속] 후원 내역·평가 체계·지급 기준을 보기 쉬운 요약본으로 정리해 상시 공개하겠습니다.`,
+
+  "상담":
+`[이해] 상담은 더 섬세한 배려가 필요합니다.
+[즉시조치] 상담사 변경·기록 열람 범위 재설정이 가능합니다. 원하시면 바로 조치하겠습니다({contact}).
+[근거] 비밀보장·최소 열람·보관 기간 준수 원칙으로 운영합니다({policy_link}).
+[후속약속] 회기당 시간·맞춤 조언 제공 방식을 개선하고, 후속 예약 경로를 간소화하겠습니다.`,
+
+  "연락/소통":
+`[이해] 회신 지연으로 불편을 드렸습니다.
+[즉시조치] 현재 문의 건을 우선 처리하고, 대체 채널(전화/문자/이메일) 중 원하시는 경로로 재안내 드리겠습니다({contact}).
+[근거] 표준 회신 목표는 24~48시간입니다(휴관·성수기 예외 고지, {policy_link}).
+[후속약속] 발신 전송·수신 누락 모니터링을 강화하고 공지 채널을 단일화하겠습니다.`,
+
+  "자료/콘텐츠":
+`[이해] 자료 접근 불편을 확인했습니다.
+[즉시조치] 링크 복구·재전달 가능 범위를 확인해 오늘 중 유효 링크로 교체하겠습니다({alt_link}).
+[근거] 운영 기간 내 제공이 원칙이며, 저작권·접근성(자막/대체텍스트) 기준을 적용합니다({policy_link}).
+[후속약속] 자료 보관·만료 일정을 사전 고지하고, 재수강·요약본 제공 범위를 명확히 안내하겠습니다.`,
+
+  "공간/환경":
+`[이해] 시설·환경으로 불편을 드렸습니다.
+[즉시조치] 온도·소음·청결·와이파이 상태를 즉시 점검하고, 대체 좌석·조용 구역·혼잡 시간 정보를 안내하겠습니다.
+[근거] 안전·접근성 기준에 따라 개선 우선순위를 정해 조치합니다({policy_link}).
+[후속약속] 장애인 접근 동선·사물함·안내 표지를 보완하고 정기 점검 결과를 공유하겠습니다.`,
+
+  "일정/기한":
+`[이해] 일정 표기 혼선이 있었습니다.
+[즉시조치] {date} 기준 공지·캘린더를 정정하고 개별 알림을 재발송하겠습니다({alt_link}).
+[근거] 마감은 ‘절대시각(예: 금 18:00, KST)’ 기준이며, 타임존 표기는 ISO 형식으로 통일합니다({policy_link}).
+[후속약속] 변경 이력·리마인드 정책을 강화하겠습니다.`,
+
+  "기관 신뢰성":
+`[이해] 운영 주체와 신뢰성은 매우 중요합니다.
+[즉시조치] 위탁 주체(구/시), 사업 공고문, 평가 체계 링크를 일괄 제공하겠습니다({policy_link}).
+[근거] 특정 종교·정당·영리와 무관한 공공 위탁기관으로 관련 지침을 따릅니다.
+[후속약속] 민원 처리 체계·예산 요약·성과 지표를 정기 공개하겠습니다.`,
+
+  "참여 자격":
+`[이해] 자격 요건이 혼란스러우셨을 수 있습니다.
+[즉시조치] {program}의 연령·지역·재참여·학적·재직 요건을 표·사례로 재안내하겠습니다({alt_link}).
+[근거] 공고 범위 내 광역·타지역 참여가 가능할 수 있으나, 사업별 세부 요건이 상이합니다({policy_link}).
+[후속약속] FAQ·자가진단 체크리스트를 상시 업데이트하겠습니다.`,
+
+  "리워드/경품":
+`[이해] 리워드 지급·공정성에 대한 우려를 확인했습니다.
+[즉시조치] 대상 기준·지급 일정·재전송 가능 여부를 조회해 개별 회신드리겠습니다({contact}).
+[근거] 소액 기념품은 관련 지침·선거법 범위 내에서만 운영하며 절차·기준을 공개합니다({policy_link}).
+[후속약속] 표기·추첨 검증 절차를 보강하고 요약본으로 고지하겠습니다.`,
+
+  "보안/시스템":
+`[이해] 시스템 불편을 확인했습니다.
+[즉시조치] 오류 원인을 분류(서버/브라우저/권한)해 복구하고, 임시 저장·대체 제출 경로를 안내하겠습니다({alt_link}).
+[근거] 가용성·무결성 기준에 맞춰 모니터링·백업을 운영합니다({policy_link}).
+[후속약속] 동일 유형 재발 방지 패치를 적용하고 공지로 공유하겠습니다.`,
+
+  "기타":
+`[이해] 남겨주신 제안/문의는 운영 개선에 큰 도움이 됩니다.
+[즉시조치] 관련 기준과 사실관계를 확인해 가장 빠른 조치 경로로 처리하고 결과를 안내드리겠습니다({contact}).
+[후속약속] 유사 문의를 FAQ에 반영하고 월별 현황을 공개하겠습니다.`
+};
+
+/* ---------- 짧은 답변(알림/DM용 요약본) ---------- */
+const RESPONSES_BRIEF = {
+  "운영시간/공간": "불편을 이해합니다. 오늘 혼잡·대체 좌석 정보를 갱신하고, 야간·주말 수요는 다음 분기 편성에 반영하겠습니다.",
+  "선발/절차": "요청 시 요약 사유를 개별 안내드리고, 다음 모집의 절대시각·체크리스트를 사전 고지하겠습니다.",
+  "개인정보/마케팅": "수신 거부·삭제를 즉시 처리하고 결과 회신드리겠습니다. 보관·열람 기준은 링크로 안내드립니다.",
+  "프로그램 품질": "속도·자료·Q&A를 조정하고 필요 시 보완 세션/자료를 제공하겠습니다.",
+  "공정성/청렴성": "사실관계를 점검해 필요 시 시정·공개 조치하겠습니다. 기준과 절차는 링크로 확인 가능합니다.",
+  "상담": "상담사 변경과 기록 범위 재설정이 가능합니다. 원하시면 바로 조치하겠습니다.",
+  "연락/소통": "지연 사과드립니다. 우선 처리 후 원하시는 채널로 재안내드리겠습니다.",
+  "자료/콘텐츠": "링크를 복구·교체해 오늘 중 유효 링크로 재전달하겠습니다.",
+  "공간/환경": "현장 상태를 즉시 점검하고 조용 구역·대체 좌석을 안내하겠습니다.",
+  "일정/기한": "공지·캘린더를 정정하고, 마감 ‘절대시각’ 표기를 표준화하겠습니다.",
+  "기관 신뢰성": "위탁 주체·공고문·평가 체계를 일괄 제공드리겠습니다.",
+  "참여 자격": "연령·지역·재참여 등 세부 요건을 표로 재안내하겠습니다.",
+  "리워드/경품": "대상·일정·재전송 여부를 조회해 개별 회신하겠습니다.",
+  "보안/시스템": "오류 원인을 분류해 복구하고 대체 제출 경로를 즉시 안내하겠습니다.",
+  "기타": "가장 빠른 조치 경로로 처리하고 결과를 안내드리겠습니다."
 };
 
 /* ---------- 114건 내장 데이터 (100 + ‘기타’ 14) ---------- */
@@ -175,236 +255,4 @@ const CASES = [
   {q:"선거기간 리워드 지급 괜찮나요?",cat:"리워드/경품"},
   /* 기타 14 */
   {q:"센터 위치 안내 표지가 부족합니다. 초행길 안내가 있었으면 합니다.",cat:"기타"},
-  {q:"현장 사진·영상 촬영 동의 절차가 궁금합니다.",cat:"기타"},
-  {q:"분실물 보관 및 인수인계 절차를 알려주세요.",cat:"기타"},
-  {q:"대기 번호 시스템이 있었으면 합니다.",cat:"기타"},
-  {q:"행사 후 만족도 조사 결과를 공유해 주실 수 있나요?",cat:"기타"},
-  {q:"주차 공간 이용 기준이 필요합니다.",cat:"기타"},
-  {q:"현장 자원봉사 참여 방법을 안내해 주세요.",cat:"기타"},
-  {q:"장애인 보조공학기기 대여가 가능한가요?",cat:"기타"},
-  {q:"유아 동반 공간 이용 수칙이 있나요?",cat:"기타"},
-  {q:"분야별 멘토링 상시 신청 창구가 있었으면 합니다.",cat:"기타"},
-  {q:"센터 이용 에티켓(소음·통화 등)을 정리해 주세요.",cat:"기타"},
-  {q:"알레르기 정보 표시(간식/다과)가 필요합니다.",cat:"기타"},
-  {q:"비상 상황 시 대피 요령을 사전에 안내받고 싶습니다.",cat:"기타"},
-  {q:"민원·제안 접수 현황을 월별로 공개해 주세요.",cat:"기타"}
-];
-
-/* ---------- 실행(DOMContentLoaded 보장) ---------- */
-document.addEventListener('DOMContentLoaded', () => {
-
-     /* ① 헤더만 고정하도록 sticky 변수 0으로 정리 (기존 보정 로직 무력화) */
-  const root = document.documentElement;
-  root.style.setProperty('--sticky-toolbar', '0px');
-  root.style.setProperty('--sticky-filters', '0px');
-
-  /* ② 우측 하단 [위로가기] 버튼 생성 */
-  const toTop = document.createElement('button');
-  toTop.id = 'backToTop';
-  toTop.type = 'button';
-  toTop.textContent = '위로';
-  document.body.appendChild(toTop);
-
-  // 부드러운 스크롤
-  toTop.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  // 스크롤 위치에 따라 표시/숨김
-  const toggleToTop = () => {
-    if (window.scrollY > 400) toTop.classList.add('show');
-    else toTop.classList.remove('show');
-  };
-  window.addEventListener('scroll', toggleToTop, { passive: true });
-  toggleToTop();
-
-  /* ③ (선택) 기존 sticky 오프셋 자동 보정 함수가 있다면 0으로 유지 */
-  if (typeof updateStickyOffset === 'function') {
-    // 툴바/필터 sticky를 쓰지 않으므로 고정값 유지
-    root.style.setProperty('--sticky-toolbar', '0px');
-    root.style.setProperty('--sticky-filters', '0px');
-  }
-
-  // 리스트 UI 모드 활성화
-  document.body.classList.add('list-mode');
-
-  /* 요소 수집 */
-  const els = {
-    search: document.getElementById('search'),
-    chips: document.getElementById('chips'),
-    tbody: document.getElementById('tbody'),
-    shown: document.getElementById('shown'),
-    total: document.getElementById('total'),
-    prev: document.getElementById('prev'),
-    next: document.getElementById('next'),
-    pageSize: document.getElementById('pageSize'),
-    pageInfo: document.getElementById('pageInfo'),
-    toggleTheme: document.getElementById('toggleTheme'),
-    openIssues: document.getElementById('openIssues'),
-  };
-
-  /* 상태 */
-  const CATS = ["운영시간/공간","선발/절차","개인정보/마케팅","프로그램 품질","공정성/청렴성","상담","연락/소통","자료/콘텐츠","공간/환경","일정/기한","기관 신뢰성","참여 자격","리워드/경품","보안/시스템","기타"];
-  let page = 1;
-  let pageSize = Number(els.pageSize?.value)||50; // 기본 50
-  let activeCats = new Set();
-  let view = CASES.map((d,i)=>({idx:i+1,q:d.q,cat:d.cat,a:RESPONSES[d.cat]||RESPONSES["기타"]}));
-
-  /* 유틸 */
-  const escapeHTML = (s)=> String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-  const parseSearch = (q)=>{
-    q=(q||'').trim(); const cat=[],not=[],words=[];
-    const re=/(\b카테고리:"([^"]+)"|\-키워드:"([^"]+)"|("[^"]+"|\S+))/g; let m;
-    while((m=re.exec(q))){
-      if(m[2]) cat.push(m[2].trim());
-      else if(m[3]) not.push(m[3].trim().toLowerCase());
-      else{ const w=m[1].replace(/^"|"$|^'|'$/g,'').trim(); if(w) words.push(w.toLowerCase()); }
-    }
-    return {cat,not,words};
-  };
-  const highlight=(html,terms)=>{
-    if(!terms||!terms.length) return html;
-    let out=html; terms.forEach(t=>{ const safe=t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); out=out.replace(new RegExp(safe,'gi'), m=>`<mark>${m}</mark>`); });
-    return out;
-  };
-  const filteredRows=()=>{
-    const termRaw=(els.search?.value||"").trim();
-    const parsed=parseSearch(termRaw);
-    const terms=(parsed.words||[]).filter(Boolean);
-    const rows=view.filter(r=>{
-      if(activeCats.size && !activeCats.has(r.cat)) return false;
-      if(parsed.cat.length && !parsed.cat.includes(r.cat)) return false;
-      const hay=(r.q+" "+r.a+" "+r.cat).toLowerCase();
-      if(parsed.not.some(n=>hay.includes(n))) return false;
-      if(!terms.length) return true;
-      return terms.every(w=>hay.includes(w));
-    });
-    return {rows,terms};
-  };
-
-  /* 칩 렌더 */
-  const renderChips=()=>{
-    if(!els.chips) return;
-    els.chips.innerHTML = `<button class="chip" id="chipReset" type="button">필터 해제</button>` + CATS.map(c=>`<button class="chip" data-cat="${c}" type="button">${c}</button>`).join('');
-    document.getElementById('chipReset')?.addEventListener('click', ()=>{ activeCats.clear(); syncChips(); page=1; render(); });
-    els.chips.querySelectorAll('.chip[data-cat]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const c=btn.dataset.cat;
-        activeCats.has(c)?activeCats.delete(c):activeCats.add(c);
-        syncChips(); page=1; render();
-      });
-    });
-    syncChips();
-  };
-  const syncChips=()=> els.chips?.querySelectorAll('.chip[data-cat]').forEach(b=> b.classList.toggle('active', activeCats.has(b.dataset.cat)));
-
-  /* 행/렌더 */
-  const rowHtml=(r,terms)=>{
-    const qHtml=highlight(escapeHTML(r.q),terms);
-    const aHtml=highlight(escapeHTML(r.a||'').replace(/\n/g,'<br>'),terms);
-    return `<tr>
-      <td data-h="#">${r.idx}</td>
-      <td data-h="민원 사례"><span class="q">${qHtml}</span> <span class="cat">${r.cat}</span></td>
-      <td data-h="가이드"><div class="resp">${aHtml}</div></td>
-      <td data-h="복사">
-        <div class="row-actions">
-          <button class="btn copy" type="button" data-copy data-idx="${r.idx}" aria-label="이 카드 내용 복사">복사하기</button>
-        </div>
-      </td>
-    </tr>`;
-  };
-
-  const render=()=>{
-    const {rows,terms}=filteredRows();
-    els.total && (els.total.textContent = view.length);
-    els.shown && (els.shown.textContent = rows.length);
-
-    const pages=Math.max(1, Math.ceil(rows.length / pageSize));
-    if(page>pages) page=pages;
-    const start=(page-1)*pageSize;
-    const slice=rows.slice(start, start+pageSize);
-
-    els.tbody.innerHTML = slice.length
-      ? slice.map(r=>rowHtml(r,terms)).join('')
-      : `<tr><td colspan="4" style="padding:18px">검색 조건에 맞는 결과가 없습니다.</td></tr>`;
-
-    els.pageInfo && (els.pageInfo.textContent = `${page}/${pages}`);
-    els.prev && (els.prev.disabled = (page<=1));
-    els.next && (els.next.disabled = (page>=pages));
-  };
-
-  /* 이벤트 */
-  els.search?.addEventListener('input', ()=>{ page=1; render(); });
-  els.prev?.addEventListener('click', ()=>{ if(page>1){ page--; render(); } });
-  els.next?.addEventListener('click', ()=>{ page++; render(); });
-  els.pageSize?.addEventListener('change', ()=>{ pageSize=Number(els.pageSize.value)||50; page=1; render(); });
-  els.toggleTheme?.addEventListener('click', ()=>{
-    const root=document.documentElement;
-    root.setAttribute('data-theme', root.getAttribute('data-theme')==='dark' ? 'auto' : 'dark');
-  });
-
-  // [복사하기] 버튼: 이벤트 위임으로 처리
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-copy]');
-    if (!btn) return;
-    const tr   = btn.closest('tr');
-    const qEl  = tr?.querySelector('.q');
-    const catEl= tr?.querySelector('.cat');
-    const aEl  = tr?.querySelector('.resp');
-
-    const q    = (qEl?.innerText || '').trim();
-    const cat  = (catEl?.innerText || '').trim();
-    const ans  = (aEl?.innerText || '').trim();
-
-    const text = [
-      `민원: ${q}${cat ? ` (${cat})` : ''}`,
-      '',
-      '가이드:',
-      ans
-    ].join('\n');
-
-    copyToClipboard(text).then(() => showToast('복사했습니다.'));
-  });
-
-  // 클립보드 + 토스트
-  function copyToClipboard(text){
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text);
-    }
-    return new Promise((resolve) => {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed'; ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy');
-      document.body.removeChild(ta);
-      resolve();
-    });
-  }
-  function showToast(msg){
-    let t = document.getElementById('toast');
-    if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => t.classList.remove('show'), 1200);
-  }
-
-  /* Sticky 오프셋 자동 보정 */
-  function updateStickyOffset(){
-    const tb = document.querySelector('.toolbar');
-    const fl = document.querySelector('.filters');
-    const root = document.documentElement;
-    const tbH = tb ? tb.offsetHeight : 0;
-    const flH = fl ? fl.offsetHeight : 0;
-    root.style.setProperty('--sticky-toolbar', tbH + 'px');
-    root.style.setProperty('--sticky-filters', flH + 'px');
-  }
-  window.addEventListener('resize', updateStickyOffset);
-  new ResizeObserver(updateStickyOffset).observe(document.body);
-  updateStickyOffset();
-
-  /* 시작 */
-  renderChips();
-  render();
-});
+  {q:"현장 사진·영상 촬영 동의 절차가 궁금합니다.",cat:"기타"}
