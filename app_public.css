@@ -254,3 +254,86 @@ body.list-mode tbody tr{ scroll-margin-top: 8px; }
   padding: 0 6px;
   font-weight: 700;
 }
+
+/* =========================
+   Dark mode contrast fix
+   ========================= */
+
+/* 1) 다크 테마 토큰 재정의(대비 강화) */
+html[data-theme="dark"]{
+  --bg:#0f1216;                 /* 배경 */
+  --surface:#171b21;            /* 카드/칩/입력 배경 */
+  --text:#e9edf3;               /* 본문 텍스트 */
+  --muted:#a6b0c3;              /* 보조 텍스트 */
+  --line:#2e3642;               /* 구분선 */
+  --primary:#6ea8ff;            /* 강조색 */
+  --primary-ink:#ffffff;        /* 강조 버튼의 글자색(흰색 유지) */
+  --primary-weak:rgba(110,168,255,.18); /* 칩/뱃지 약한 강조 */
+}
+
+/* 2) 카드/칩/입력 배경을 다크에서 surface로 일관화 */
+body.list-mode tbody tr{
+  background:var(--surface);
+}
+.chip,
+.toolbar input[type="search"],
+.btn{
+  background:var(--surface);
+  border-color:var(--line);
+  color:var(--text);
+}
+
+/* 3) 기본/강조 버튼 대비 + hover 포커스 */
+.btn.primary{
+  background:var(--primary);
+  color:var(--primary-ink);
+  border-color:var(--primary);
+}
+.btn:hover{ filter:brightness(1.06); }
+.btn.primary:hover{ filter:brightness(0.96); }
+
+/* 4) 카테고리 뱃지/번호칸 대비 */
+td[data-h="#"]{
+  background:color-mix(in oklab, var(--primary-weak) 40%, transparent);
+  color:var(--muted);
+}
+.cat{
+  color:var(--muted);
+  border-color:var(--line);
+  background:transparent;
+}
+
+/* 5) 마크(검색 하이라이트) 가독성 */
+mark{
+  background: #ffe08a;          /* 라이트 */
+  color: #222;
+  padding:.1em .25em;
+  border-radius:.25em;
+}
+html[data-theme="dark"] mark{
+  background: #634200;          /* 다크에서 노란 하이라이트가 너무 밝지 않게 */
+  color: #fff;
+}
+
+/* 6) 입력 placeholder 색 보정 */
+::placeholder{ color: color-mix(in oklab, var(--muted) 70%, transparent); }
+html[data-theme="dark"] ::placeholder{ color: color-mix(in oklab, var(--muted) 60%, #000); }
+
+/* 7) 표/카드 테두리/섀도우 약간 강화(다크) */
+html[data-theme="dark"] body.list-mode tbody tr{
+  box-shadow: 0 1px 0 rgba(0,0,0,.35), 0 12px 24px rgba(0,0,0,.25);
+  border-color: var(--line);
+}
+
+/* 8) 페이지네이션/셀렉트 글자색 정렬 */
+#pageInfo{ color:var(--text); }
+#pageSize{ color:var(--text); background:var(--surface); border-color:var(--line); }
+
+/* 9) 우측 하단 위로가기 버튼도 대비 유지 */
+#backToTop{
+  background:var(--primary);
+  color:var(--primary-ink);
+  border-color:var(--primary);
+}
+#backToTop:hover{ filter:brightness(0.95); }
+
