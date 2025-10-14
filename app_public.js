@@ -508,22 +508,3 @@ document.addEventListener('DOMContentLoaded', function () {
   renderChips();
   render();
 });
-
-<script>
-  (function(){
-    // 표기 연도 자동
-    var y = new Date().getFullYear();
-    var yrEl = document.getElementById('copyrightYear');
-    if(yrEl) yrEl.textContent = y;
-
-    // 필요 시 배포 버전/업데이트 날짜 한 번에 교체
-    var APP_VERSION = '1.0';              // 필요 시 변경
-    var UPDATED_AT  = '2025-01-01';       // YYYY-MM-DD
-
-    var vEl = document.getElementById('appVersion');
-    if(vEl) vEl.textContent = APP_VERSION;
-
-    var tEl = document.getElementById('updatedAt');
-    if(tEl){ tEl.setAttribute('datetime', UPDATED_AT); tEl.textContent = UPDATED_AT; }
-  })();
-</script>
