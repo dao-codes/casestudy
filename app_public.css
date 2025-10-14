@@ -337,3 +337,37 @@ html[data-theme="dark"] body.list-mode tbody tr{
 }
 #backToTop:hover{ filter:brightness(0.95); }
 
+.site-footer{
+  border-top:1px solid var(--c-border,rgba(0,0,0,.08));
+  background:var(--c-foot-bg,#fafafa);
+  color:var(--c-foot-fg,#2b2f36);
+  font-size:.9rem;
+  line-height:1.6;
+  margin-top:40px;
+}
+.footer-inner{max-width:980px;margin:0 auto;padding:20px 16px 28px;}
+.footer-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;}
+.footer-brand{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.foot-title{font-weight:700;}
+.foot-divider{opacity:.5}
+.footer-contact a{color:inherit;text-decoration:underline dotted}
+.foot-purpose{margin:12px 0 6px}
+.foot-notice{margin:0 0 10px 0;padding-left:18px}
+.foot-notice li{margin:4px 0}
+.foot-meta{opacity:.8;font-size:.85rem;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.foot-meta .dot{opacity:.6}
+
+/* 다크 모드 */
+@media (prefers-color-scheme: dark){
+  .site-footer{
+    --c-foot-bg:#0f1116;
+    --c-foot-fg:#e9edf2;
+    --c-border:rgba(255,255,255,.12);
+  }
+}
+html[data-theme="dark"] .site-footer{
+  --c-foot-bg:#0f1116;
+  --c-foot-fg:#e9edf2;
+  --c-border:rgba(255,255,255,.12);
+}
+
