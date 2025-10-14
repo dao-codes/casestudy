@@ -371,3 +371,109 @@ html[data-theme="dark"] .site-footer{
   --c-border:rgba(255,255,255,.12);
 }
 
+/* ===== Footer – 안정화 오버라이드 ===== */
+
+/* 1) 레이아웃 안정화: 부모 overflow/좌우 여백 충돌 시 잘림 방지 */
+.site-footer{
+  position: relative;
+  clear: both;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+  margin-left: 0;            /* 혹시 모를 음수마진 상쇄 */
+  margin-right: 0;
+  margin-top: 48px;          /* 본문과 분리 */
+  border-top: 1px solid var(--c-border, rgba(0,0,0,.08));
+  background: var(--c-foot-bg, #fafafa);
+  color: var(--c-foot-fg, #2b2f36);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  box-sizing: border-box;
+  z-index: 0;                /* 상단 고정요소보다 뒤로 */
+}
+
+/* 2) 컨테이너: 좌우 여백/하단 패딩(우하단 '위로' 버튼과 겹침 방지) */
+.footer-inner{
+  width: 100%;
+  max-width: 1040px;         /* 페이지 컨테이너 폭과 맞추세요 */
+  margin: 0 auto;
+  padding: 24px 16px 88px;   /* 하단 여유 ↑ */
+  box-sizing: border-box;
+}
+
+/* 3) 상단 1행: 좌우 배치 + 줄바꿈 대응 */
+.footer-row{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.footer-brand{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.foot-title{ font-weight: 700; white-space: nowrap; }
+.foot-divider{ opacity: .55; }
+.footer-contact{
+  margin-left: auto;
+  font-style: normal;        /* <address> 기울임 제거 */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.footer-contact a{
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;   /* 긴 이메일/URL 줄바꿈 */
+}
+
+/* 4) 본문/고지 */
+.foot-purpose{ margin: 12px 0 8px; }
+.foot-notice{
+  margin: 0 0 12px 0;
+  padding-left: 1.1em;       /* 목록 들여쓰기 표준화 */
+  list-style: disc;
+}
+.foot-notice li{ margin: 4px 0; }
+
+/* 5) 하단 메타: 경계선·간격 가독성 개선 */
+.foot-meta{
+  border-top: 1px dashed var(--c-border, rgba(0,0,0,.1));
+  padding-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  opacity: .9;
+  font-size: .88rem;
+}
+.foot-meta .dot{ opacity: .6; }
+
+/* 6) 다크 모드 변수 */
+@media (prefers-color-scheme: dark){
+  .site-footer{
+    --c-foot-bg:#0f1116;
+    --c-foot-fg:#e9edf2;
+    --c-border:rgba(255,255,255,.12);
+  }
+}
+html[data-theme="dark"] .site-footer{
+  --c-foot-bg:#0f1116;
+  --c-foot-fg:#e9edf2;
+  --c-border:rgba(255,255,255,.12);
+}
+
+/* 7) 모바일 최적화: 좌측 잘림/충돌 예방 */
+@media (max-width: 640px){
+  .footer-inner{ padding: 20px 16px 96px; }
+  .footer-row{ flex-direction: column; align-items: flex-start; }
+  .footer-contact{ margin-left: 0; }
+  .foot-title{ line-height: 1.4; }
+}
