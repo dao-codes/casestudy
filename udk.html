@@ -22,8 +22,8 @@
             --font-main: 'Pretendard', -apple-system, sans-serif;
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
             
-            /* 반응형 넉넉한 좌우 여백 (모바일 최소 24px 보장) */
-            --container-pad: clamp(24px, 5vw, 120px);
+            /* 반응형 넉넉한 좌우 여백 (모바일 최소 32px 보장, 데스크탑 기본 8vw로 확대) */
+            --container-pad: clamp(32px, 8vw, 160px);
             --grid-gap: 2vw;
         }
 
@@ -261,7 +261,8 @@
 
         @media (max-width: 992px) {
             h1, h2, h3, h4, .pricing-title, .coin-title, .svi-title, .footer-cta { line-height: 1.35 !important; }
-            .hero-title { font-size: clamp(3rem, 10vw, 6rem); margin-bottom: 8vh; word-break: keep-all; }
+            /* 모바일에서 텍스트가 좌우 여백을 너무 잡아먹지 않도록 폰트 최대치 축소 */
+            .hero-title { font-size: clamp(2.5rem, 8vw, 5rem); margin-bottom: 8vh; word-break: keep-all; }
             
             .hero-bottom-area { display: flex; flex-direction: column; gap: 40px; }
             .hero-meta { flex-direction: row; flex-wrap: wrap; gap: 24px; margin-bottom: 0; }
@@ -274,7 +275,8 @@
             .data-content { grid-template-columns: 1fr; gap: 8vh; }
             
             .item-category { grid-column: 1 / 13; margin-bottom: 1vh;}
-            .item-title { grid-column: 1 / 13; font-size: clamp(2.5rem, 8vw, 4rem); transition: none;}
+            /* 포트폴리오 리스트 폰트 크기 조정하여 숨통 틔우기 */
+            .item-title { grid-column: 1 / 13; font-size: clamp(2rem, 7vw, 3.5rem); transition: none;}
             .item-metric { grid-column: 1 / 13; text-align: left; margin-top: 2vh;}
             .list-item:hover .item-title { padding-left: 0; } 
 
@@ -343,7 +345,9 @@
                     <div class="meta-item"><span>Target</span><span class="meta-value">Life-cycle</span></div>
                 </div>
                 <p class="hero-subtitle">
-                    결핍을 구조적으로 해결하는 시장 기반의 대안. 여성 청소년의 보편적 월경권부터 시니어의 돌봄까지, 업드림코리아가 삶의 기준을 바꿉니다.
+                    결핍을 구조적으로 해결하는 시장 기반의 대안. <comment-tag id="1">여성 청소년의 보편적 월경권부터 시니어의 돌봄까지, 업드림코리아가 삶의 기준을 바꿉니다.</comment-tag id="1" text="'시니어의 돌봄'에서 '의'를 빼고, '바꿉니다'를 '새롭게 정립합니다' 혹은 '한 단계 높입니다'로 바꾸면 기업의 비전이 더욱 전문적이고 거시적으로 느껴집니다.
+
+추천: '여성 청소년의 보편적 월경권부터 시니어 돌봄까지, 업드림코리아가 삶의 기준을 새롭게 정립합니다.'" type="suggestion">
                 </p>
             </div>
             
@@ -357,7 +361,9 @@
             <div class="section-label" data-parallax="-0.03">Price Innovation</div>
             <div class="pricing-content fade-in">
                 <h2 class="pricing-title">한국은 OECD에서<br>생리대가 가장 비싼 나라입니다.</h2>
-                <p>생리대 살 돈이 없어 신발 깔창을 쓰는 아이가 있었습니다.<br>우리는 복지가 아닌 가격 혁신으로 이 문제를 풀었습니다.</p>
+                <p>생리대 살 돈이 없어 신발 깔창을 쓰는 아이가 있었습니다.<br><comment-tag id="2">우리는 복지가 아닌 가격 혁신으로 이 문제를 풀었습니다.</comment-tag id="2" text="'문제를 풀었습니다'라는 표현은 다소 구어체에 가깝습니다. 기업의 핵심 가치를 전달하는 만큼 조금 더 무게감 있는 단어를 추천합니다.
+
+추천: '우리는 일회성 복지가 아닌, 지속 가능한 가격 혁신으로 이 문제를 해결합니다.'" type="suggestion"></p>
                 
                 <div class="chart-container">
                     <div class="bar-row">
@@ -394,7 +400,9 @@
             
             <div class="coin-action fade-in">
                 <h2 class="coin-title">코인 하나가,<br>존엄 하나가 됩니다.</h2>
-                <p>지역아동센터 화장실에 놓인 무료 생리대 자판기.<br>요청도, 승인도 필요 없이 눈치 보지 않고 위급한 순간을 넘깁니다.</p>
+                <p>지역아동센터 화장실에 놓인 무료 생리대 자판기.<br><comment-tag id="3">요청도, 승인도 필요 없이 눈치 보지 않고 위급한 순간을 넘깁니다.</comment-tag id="3" text="'위급한 순간을 넘깁니다'는 다소 수동적이거나 임시방편적인 뉘앙스를 줄 수 있습니다. 대상자의 존엄성을 강조하는 방향으로 윤문해 보세요.
+
+추천: '어떠한 증명이나 요청도 필요 없습니다. 아이들이 눈치 보지 않고 가장 필요한 순간을 안전하게 맞이할 수 있도록 돕습니다.'" type="suggestion"></p>
                 <div style="display: flex; flex-direction: column; align-items: flex-start;">
                     <button class="coin-btn custom-hover" id="coin-btn" aria-live="polite">
                         <span class="btn-text">자판기에 코인 넣기</span>
@@ -420,7 +428,9 @@
                 <div class="data-block">
                     <span class="data-label">Public Infrastructure</span>
                     <div class="data-number"><span class="counter" data-target="55" data-format="int">0</span>+</div>
-                    <p>곳의 무료 자판기를 설치해 낙인효과를 지웠습니다.</p>
+                    <p><comment-tag id="4">곳의 무료 자판기를 설치해 낙인효과를 지웠습니다.</comment-tag id="4" text="조사 '의'가 생략되거나 숫자에 이어지는 수식어 연결이 다소 어색합니다. 또한 '낙인효과를 지웠습니다'를 조금 더 명확하고 전문적으로 풀어쓰면 좋습니다.
+
+추천: '곳에 무료 자판기를 설치하여 선별적 복지가 주는 낙인효과를 지워나가고 있습니다.'" type="suggestion"></p>
                 </div>
                 <div class="data-block">
                     <span class="data-label">Impact Investment</span>
@@ -469,7 +479,9 @@
             <div class="svi-grid fade-in" style="transition-delay: 0.2s;">
                 <div class="svi-item custom-hover">
                     <h4>Social Value</h4>
-                    <p>저소득층 생리대 527만 장 기부 및 무료 자판기 55개소 운영, 자립준비청년 협동조합 안착 등 탁월한 사회적 성과.</p>
+                    <p><comment-tag id="5">저소득층 생리대 527만 장 기부 및 무료 자판기 55개소 운영, 자립준비청년 협동조합 안착 등 탁월한 사회적 성과.</comment-tag id="5" text="문장이 명사형으로 끝나는 것보다, 가치 창출에 대한 동사형 서술어를 덧붙이면 성과가 더욱 돋보입니다. '저소득층' 대신 최근 ESG 트렌드에 맞는 '취약계층' 사용도 고려해 보세요.
+
+추천: '취약계층 생리대 527만 장 기부, 무료 자판기 55개소 운영, 자립준비청년 협동조합의 성공적 안착을 통해 탁월한 사회적 가치를 창출합니다.'" type="suggestion"></p>
                 </div>
                 <div class="svi-item custom-hover">
                     <h4>Economic Value</h4>
