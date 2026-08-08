@@ -202,6 +202,10 @@
         .item-title { grid-column: 3 / 10; font-size: clamp(2rem, 4vw, 5rem); font-weight: 400; letter-spacing: -0.03em; color: var(--gray-500); transition: padding-left 0.6s var(--ease-out-expo), color 0.5s ease; line-height: 1.2; }
         .item-metric { grid-column: 10 / 13; font-size: 14px; font-weight: 500; text-align: right; color: var(--gray-800); }
 
+        /* 모바일 전용 포트폴리오 이미지 기본 숨김 */
+        .mobile-portfolio-img { display: none; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; margin-top: 4vh; grid-column: 1 / 13; filter: grayscale(100%); transition: filter 0.5s ease; }
+        .list-item:active .mobile-portfolio-img { filter: grayscale(0%); } /* 터치 시 흑백 해제 */
+
         /* SVI & Footer Background Unified */
         .svi-section { padding: 15vh 0 5vh; background: var(--black); color: var(--white); border-top: 1px solid rgba(255,255,255,0.1);}
         .svi-title { grid-column: 1 / 5; font-size: clamp(2rem, 3.5vw, 4rem); line-height: 1.2; }
@@ -276,9 +280,12 @@
             
             .item-category { grid-column: 1 / 13; margin-bottom: 1vh;}
             /* 포트폴리오 리스트 폰트 크기 조정하여 숨통 틔우기 */
-            .item-title { grid-column: 1 / 13; font-size: clamp(2rem, 7vw, 3.5rem); transition: none;}
+            .item-title { grid-column: 1 / 13; font-size: clamp(2.5rem, 8vw, 4rem); transition: none;}
             .item-metric { grid-column: 1 / 13; text-align: left; margin-top: 2vh;}
             .list-item:hover .item-title { padding-left: 0; } 
+            
+            /* 모바일에서 이미지 노출 */
+            .mobile-portfolio-img { display: block; }
 
             .svi-title { grid-column: 1 / 13; margin-bottom: 6vh; }
             .svi-grid { grid-column: 1 / 13; grid-template-columns: 1fr; gap: 6vh; }
@@ -448,21 +455,25 @@
                     <div class="item-category">Woman Care</div>
                     <div class="item-title">산들산들</div>
                     <div class="item-metric">1+1 평생 기부 모델</div>
+                    <img src="https://www.sentv.co.kr/data/sentv/image/2025/12/18/sentv20251218000135.jpg" alt="산들산들" class="mobile-portfolio-img">
                 </div>
                 <div class="list-item custom-hover portfolio-item" data-img="https://images.squarespace-cdn.com/content/v1/61cc494289bb2f1fc3b0c2f6/1707801561807-B2YXX653QGGHNOT921ZS/KakaoTalk_Photo_2023-12-15-17-32-52+004.png">
                     <div class="item-category">Senior Care</div>
                     <div class="item-title">비엔 (Bien)</div>
                     <div class="item-metric">시니어 통합 돌봄 연계</div>
+                    <img src="https://images.squarespace-cdn.com/content/v1/61cc494289bb2f1fc3b0c2f6/1707801561807-B2YXX653QGGHNOT921ZS/KakaoTalk_Photo_2023-12-15-17-32-52+004.png" alt="비엔" class="mobile-portfolio-img">
                 </div>
                 <div class="list-item custom-hover portfolio-item" data-img="https://mblogthumb-phinf.pstatic.net/MjAxODExMDFfNDAg/MDAxNTQxMDQ2MjU2MjAx.vjBQ2WLRuVb8sp9O29qOWUAmkjVtdzbDTeYnZ02kc0Eg.jUCGFAvTP0P0-T29FKxwuwgnsov8nXoOToqLOlkHV0wg.JPEG.aramin21/%EC%BA%A1%EC%B2%98.JPG?type=w800">
                     <div class="item-category">Youth Support</div>
                     <div class="item-title">엎드림 (Coop)</div>
                     <div class="item-metric">한국형 Foyer 자립 연계</div>
+                    <img src="https://mblogthumb-phinf.pstatic.net/MjAxODExMDFfNDAg/MDAxNTQxMDQ2MjU2MjAx.vjBQ2WLRuVb8sp9O29qOWUAmkjVtdzbDTeYnZ02kc0Eg.jUCGFAvTP0P0-T29FKxwuwgnsov8nXoOToqLOlkHV0wg.JPEG.aramin21/%EC%BA%A1%EC%B2%98.JPG?type=w800" alt="엎드림" class="mobile-portfolio-img">
                 </div>
                 <div class="list-item custom-hover portfolio-item" data-img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf1xJ-r3lWvRZfQwg6VdybzXTGya8g0KZJwsf3InYHA6a2lEy2R0Ru_us&s=10">
                     <div class="item-category">Value Consumption</div>
                     <div class="item-title">유닛백 & 런</div>
                     <div class="item-metric">원가 절감 및 유통 혁신</div>
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf1xJ-r3lWvRZfQwg6VdybzXTGya8g0KZJwsf3InYHA6a2lEy2R0Ru_us&s=10" alt="유닛백" class="mobile-portfolio-img">
                 </div>
             </div>
         </section>
